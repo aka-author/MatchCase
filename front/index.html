@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Company Valuation</title>
+        <link rel="stylesheet" href="css/main.css">
+        <script src="js/directory-viewer-client.js"></script>
+        <script src="js/similar-cases-reporter-client.js"></script>
+        <script src="js/matchcase.js"></script>
+        <script>
+            var GLOBAL_MATCHCASE = null;
+            function matchCaseInit() {
+                var GLOBAL_MATCHCASE = new MatchCaseController();
+            }
+        </script>
+    </head>
+    <body onload="matchCaseInit()">
+        <div>
+            <h1>Company Valuation</h1>
+            <form> 
+                <div>
+                    <label>Industry</label>
+                    <span>
+                        <select id="selectIndustry"></select>
+                    </span>
+                </div>
+                <div>
+                    <label>Country</label>
+                    <span>
+                        <select id="selectCountry"></select>
+                    </span>
+                </div>
+                <div>
+                    <label>Founded in</label>
+                    <span>
+                        <input id="inputFoundedInYear" size="4em">
+                    </span>
+                </div>
+                <div>
+                    <label>Specialization</label>
+                    <span>
+                        <select id="selectSpecialization"></select>
+                    </span>
+                </div>
+                <div>
+                    <label>Number of employees</label>
+                    <span>
+                        <input id="inputNumberOfEmployees" size="4em">
+                    </span>
+                </div>
+                <div>
+                    <label>Revenue, $M</label>
+                    <span>
+                        <input id="inputRevenue" size="4em">
+                    </span>
+                </div>
+                <div>
+                    <label></label>
+                    <span>
+                        <input type="button" value="Evaluate!" onclick="evaluateCompany()">
+                    </span>
+                </div>
+            </form>
+            <div>
+                <h2>Estimates</h2>
+                <div>
+                    <span>Company value, $M: </span>
+                    <span id="spanValuation"></span>
+                </div>
+                <div>
+                    <h2>Similar Cases</h2>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <td colspan="2">Acquirer</td>
+                            <td colspan="5">Acquiree</td>
+                            <td colspan="3">Deal</td>
+                        </tr>
+                        <tr>
+                            <td>Name</td>
+                            <td>Country</td>
+                            <td>Name</td>
+                            <td>Country</td>
+                            <td>Founded</td>
+                            <td>Specialization</td>
+                            <td>Revenue, $M</td>
+                            <td>Year</td>
+                            <td>Price, $M</td>
+                            <td>Info</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td id="tdCase1_acquirer_name"></td>
+                            <td id="tdCase1_acquirer_country"></td>
+                            <td id="tdCase1_acquiree_name"></td>
+                            <td id="tdCase1_acquiree_country"></td>
+                            <td id="tdCase1_acquiree_founded_in"></td>
+                            <td id="tdCase1_acquiree_specialization"></td>
+                            <td id="tdCase1_acquiree_revenue" class="bevaluateCaseMoney"></td>
+                            <td id="tdCase1_acquired_in"></td>
+                            <td id="tdCase1_deal_price" class="bevaluateCaseMoney"></td>
+                            <td id="tdCase1_deal_www" class="bevaluateCaseInfo">&nbsp;</td>
+                        </tr>
+                        <tr>
+                            <td id="tdCase2_acquirer_name"></td>
+                            <td id="tdCase2_acquirer_country"></td>
+                            <td id="tdCase2_acquiree_name"></td>
+                            <td id="tdCase2_acquiree_country"></td>
+                            <td id="tdCase2_acquiree_founded_in"></td>
+                            <td id="tdCase2_acquiree_specialization"></td>
+                            <td id="tdCase2_acquiree_revenue" class="bevaluateCaseMoney"></td>
+                            <td id="tdCase2_acquired_in"></td>
+                            <td id="tdCase2_deal_price" class="bevaluateCaseMoney"></td>
+                            <td id="tdCase2_deal_www" class="bevaluateCaseInfo">&nbsp;</td>
+                        </tr>
+                        <tr>
+                            <td id="tdCase3_acquirer_name"></td>
+                            <td id="tdCase3_acquirer_country"></td>
+                            <td id="tdCase3_acquiree_name"></td>
+                            <td id="tdCase3_acquiree_country"></td>
+                            <td id="tdCase3_acquiree_founded_in"></td>
+                            <td id="tdCase3_acquiree_specialization"></td>
+                            <td id="tdCase3_acquiree_revenue" class="bevaluateCaseMoney"></td>
+                            <td id="tdCase3_acquired_in"></td>
+                            <td id="tdCase3_deal_price" class="bevaluateCaseMoney"></td>
+                            <td id="tdCase3_deal_www" class="bevaluateCaseInfo">&nbsp;</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </body>
+</html>

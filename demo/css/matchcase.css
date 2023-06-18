@@ -1,0 +1,80 @@
+
+
+
+form {
+    display: table
+}
+
+form div {
+    display: table-row;
+}
+
+form div label {
+    display: table-cell;
+    padding-top: 5pt;
+}
+
+form div span {
+    display: table-cell;
+    padding-top: 5pt;
+    padding-left: 10pt;
+}
+
+thead td {
+    white-space: nowrap;
+    font-weight: bold;
+}
+
+td {
+  border-bottom: 1pt solid black;  
+}
+
+td.bevaluateCaseMoney {
+    text-align: right;
+}
+
+td.bevaluateCaseInfo {
+    text-align: center;
+}
+
+td.bevaluateCaseInfo a:link {
+    text-decoration: none;
+}
+
+td.bevaluateCaseInfo a:visited {
+    text-decoration: none;
+}
+
+td.bevaluateCaseInfo a:hover {
+    color: crimson;
+    text-decoration: none;
+}
+
+
+#divCallToAction {
+    display: inline-flexbox;
+}
+
+
+#divMatchCaseForm {
+    display: inline-flex;
+}
+
+#tableMatchCase {
+    width: 100%;
+}
+
+#divMatchCaseReportInner {
+    width: 100%;
+}
+
+#divMatchCaseReport {
+    display: inline-flex;
+    margin-left: 30pt;
+}
+
+#divMatchCase {
+    padding: 6pt;
+    border-radius: 5pt;
+    background: #f5f890;
+}

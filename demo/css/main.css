@@ -1,0 +1,71 @@
+
+@font-face {
+	font-family: 'Special';
+	src: url('FontsFree-Net-Biome-W04-Bold.ttf') format('truetype');
+ }
+
+body {
+    margin: 0;
+}
+
+#imgLogo {
+    height: 40pt;
+    margin: 5pt;
+}
+
+#spanPageTitle {
+    padding-bottom: 5pt;
+    font-size: 45pt;
+    font-style: italic;
+}
+
+#divPageHeader {
+    height: 50pt;
+    border-bottom: 4pt solid #b00c94;
+}
+
+img.coverBlamba {
+    width: 150pt;
+    height: 150pt;
+    margin: 5pt;
+}
+
+div.coverBlockLabel {
+    position: relative;
+    left: 0pt;
+    top: -130pt;
+    max-width: fit-content;
+    padding: 5pt;
+    border-radius: 5pt;
+    background: #f1ceebd7;
+    font-family: Special;
+    font-size: 10pt;
+}
+
+.coverBlock div {
+    text-align: center;
+}
+
+div.coverBlock {
+    display: inline-flex;
+}
+
+#divPageCover {
+    display: inline-flexbox
+}
+
+#divRequestForContact {
+    padding-left: 5pt;
+    padding-right: 5pt;
+    border-radius: 3pt;
+    background-color: rgb(158, 227, 159);
+}
+
+#divPageBody {
+    max-width: calc(4.5*150pt);
+    margin-left: auto;
+    margin-top: 10pt;
+    margin-right: auto;
+
+    --text-align: center;
+}

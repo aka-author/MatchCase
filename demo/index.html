@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>GettinGlobal Consulting</title>
+        <link rel="stylesheet" href="css/main.css">
+        <link rel="stylesheet" href="css/matchcase.css">
+    </head>
+    <body onload="matchCaseInit()">
+        <div id="divPageHeader">
+            <img id="imgLogo" src="img/lamplogo-02.png">
+            <span id="spanPageTitle">GettinGlobal Consulting</span>
+        </div>
+        <div id="divPageBody">
+            <div id="divPageCover">
+                <div class="coverBlock">
+                    <div style="display: block">
+                        <div>
+                            <img src="img/systermascot.jpg" class="coverBlamba">
+                        </div>
+                        <div class="coverBlockLabel">Psychology</div>
+                    </div>
+                </div>
+                <div class="coverBlock">
+                    <div>
+                        <div>
+                            <img src="img/tree1.jpg" class="coverBlamba">
+                        </div>
+                        <div class="coverBlockLabel">Ecology</div>
+                    </div>
+                </div>
+                <div class="coverBlock">
+                    <div>
+                        <div>
+                            <img src="img/global01.jpg" class="coverBlamba">
+                        </div>
+                        <div class="coverBlockLabel">Logistics</div>
+                    </div>
+                </div>
+                <div class="coverBlock">
+                    <div>
+                        <div>
+                            <img src="img/philtas.jpg" class="coverBlamba">
+                        </div>
+                        <div class="coverBlockLabel">AI & ML</div>
+                    </div>
+                </div>
+                <div class="coverBlock">
+                    <div>
+                        <div><img src="img/maski.jpg" class="coverBlamba"></div>
+                        <div class="coverBlockLabel">Entertaiment</div>
+                    </div>
+                </div>
+                <div class="coverBlock">
+                    <div>
+                        <div>
+                            <img src="img/unitaz01.jpg" class="coverBlamba">
+                        </div>
+                        <div class="coverBlockLabel">Smart Home</div>
+                    </div>
+                </div>
+                <div class="coverBlock">
+                    <div>
+                        <div>
+                            <img src="img/designer01.jpg" class="coverBlamba">
+                        </div>
+                        <div class="coverBlockLabel">Creative Tools</div>
+                    </div>
+                </div>
+                <div class="coverBlock">
+                    <div>
+                        <div>
+                            <img src="img/tellmemore01.jpg" class="coverBlamba">
+                        </div>
+                        <!--<div class="coverBlockLabel">Misc.</div>-->
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <div id="divCallToAction">
+                <script src="js/directory-viewer-client.js"></script>
+                <script src="js/similar-cases-reporter-client.js"></script>
+                <script src="js/matchcase.js"></script>
+                <script>
+                    var GLOBAL_MATCHCASE = null;
+                    function matchCaseInit() {
+                        var GLOBAL_MATCHCASE = new MatchCaseController();
+                    }
+                </script>
+                <div id="divMatchCase">
+                    <h2>What Does Your Business Look Like Now?</h2>
+                    <div id="divMatchCaseForm">
+                        <div style="display: blick">
+                        <h3>Your Company</h3>
+                        <form> 
+                            <div>
+                                <label>Industry</label>
+                                <span>
+                                    <select id="selectIndustry"></select>
+                                </span>
+                            </div>
+                            <div>
+                                <label>Country</label>
+                                <span>
+                                    <select id="selectCountry"></select>
+                                </span>
+                            </div>
+                            <div>
+                                <label>Founded in</label>
+                                <span>
+                                    <input id="inputFoundedInYear" size="4em">
+                                </span>
+                            </div>
+                            <div>
+                                <label>Specialization</label>
+                                <span>
+                                    <select id="selectSpecialization"></select>
+                                </span>
+                            </div>
+                            <div>
+                                <label>Num. of empl.</label>
+                                <span>
+                                    <input id="inputNumberOfEmployees" size="4em">
+                                </span>
+                            </div>
+                            <div>
+                                <label>Revenue, $M</label>
+                                <span>
+                                    <input id="inputRevenue" size="4em">
+                                </span>
+                            </div>
+                            <div>
+                                <label></label>
+                                <span>
+                                    <input type="button" value="Compare!" onclick="evaluateCompany()">
+                                </span>
+                            </div>
+                        </form>
+                        </div>
+                    </div>
+                    <div id="divMatchCaseReport">
+                        <div id="divMatchCaseReportInner">
+                            <div>
+                                <h3>Similar Cases</h3>
+                            </div>
+                            <table id="tableMatchCase">
+                                <thead>
+                                    <tr>
+                                        <td>Acquirer</td>
+                                        <td>Acquiree</td>
+                                        <td>Revenue, $M</td>
+                                        <td>Year</td>
+                                        <td>Price, $M</td>
+                                        <td>Info</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td id="tdCase1_acquirer_name"></td>
+                                        <td id="tdCase1_acquiree_name"></td>
+                                        <td id="tdCase1_acquiree_revenue" class="bevaluateCaseMoney"></td>
+                                        <td id="tdCase1_acquired_in"></td>
+                                        <td id="tdCase1_deal_price" class="bevaluateCaseMoney"></td>
+                                        <td id="tdCase1_deal_www" class="bevaluateCaseInfo">&nbsp;</td>
+                                    </tr>
+                                    <tr>
+                                        <td id="tdCase2_acquirer_name"></td>
+                                        <td id="tdCase2_acquiree_name"></td>
+                                        <td id="tdCase2_acquiree_revenue" class="bevaluateCaseMoney"></td>
+                                        <td id="tdCase2_acquired_in"></td>
+                                        <td id="tdCase2_deal_price" class="bevaluateCaseMoney"></td>
+                                        <td id="tdCase2_deal_www" class="bevaluateCaseInfo">&nbsp;</td>
+                                    </tr>
+                                    <tr>
+                                        <td id="tdCase3_acquirer_name"></td>
+                                        <td id="tdCase3_acquiree_name"></td>
+                                        <td id="tdCase3_acquiree_revenue" class="bevaluateCaseMoney"></td>
+                                        <td id="tdCase3_acquired_in"></td>
+                                        <td id="tdCase3_deal_price" class="bevaluateCaseMoney"></td>
+                                        <td id="tdCase3_deal_www" class="bevaluateCaseInfo">&nbsp;</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <h3>Our Humble Estimates</h3>
+                            <div>
+                                <span>Your possible company value, $M: </span>
+                                <span id="spanValuation"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="divRequestForContact">
+                    <h2>Contact Us to Start Getting Global</h2>
+                    <div>
+                        <label>Your company name</label><input>
+                        <label>Web-site</label><input>
+                    </div>
+                    <div>
+                        <label>Your name</label><input>
+                        <label>E-mail</label><input>
+                        <label>Phone number</label><input>
+                    </div>
+                    <div>
+                        <input type="button" value="Get global">
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <div id="divProposals">
+                
+            </div>
+        </div>
+        <div id="divPageFooter">
+
+        </div>
+    </body>
+</html>
