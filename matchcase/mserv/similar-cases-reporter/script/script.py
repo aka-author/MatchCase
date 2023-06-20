@@ -52,12 +52,12 @@ def parse_company_params(http_request_body: str) -> dict:
     request_data = json.loads(http_request_body)
 
     company_params = {
-        "industry": request_data["industry"],
-        "country": request_data["country"],
-        "founded_in": safe_int(request_data["founded_in"]),
-        "specialization": request_data["specialization"],
-        "num_employees": safe_int(request_data["num_employees"]),
-        "revenue": safe_float(request_data["revenue"])
+        "industry": request_data.get("industry_code"),
+        "country": request_data.get("country_code"),
+        "founded_in": safe_int(request_data.get("founded_in")),
+        "specialization": request_data.get("specialization_code"),
+        "num_employees": safe_int(request_data.get("num_employees")),
+        "revenue": safe_float(request_data.get("revenue"))
     }
     
 
@@ -148,6 +148,12 @@ def serialize_report(report: dict) -> str:
 def process_request(): 
 
     http_request_body = sys.stdin.read(int(os.environ.get("CONTENT_LENGTH", "0")))
+
+    file_path = 'c:/tmp/!!/log.txt'
+    file = open(file_path, 'w')
+    string_to_write = http_request_body
+    file.write(string_to_write)
+    file.close()
 
     company_params = parse_company_params(http_request_body)
 

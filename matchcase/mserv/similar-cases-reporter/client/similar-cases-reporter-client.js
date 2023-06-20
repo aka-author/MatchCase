@@ -1,4 +1,4 @@
-// CompCase
+// MatchCase
 // Similar Cases Reporter
 // Client library for JS
 
@@ -17,6 +17,13 @@ class MatchCaseSimilarCasesReporter {
         return this.getChief().getCfg();
     }
 
+    handleError(errorInfo) {
+        
+        this.getChief().handleError(errorInfo);
+        
+        return this;
+    }
+
     assembleSimilarCasesHttpRequestData(caseParams) {
 
         let httpRequestData = {
@@ -33,7 +40,7 @@ class MatchCaseSimilarCasesReporter {
     updatePage(evaluation) {
 
         let comparation = {
-            "valueEstimate":evaluation["company_value"],
+            "valueEstimate": evaluation["company_value"],
             "similarCases": evaluation["similar_cases"]
         };
 
@@ -44,17 +51,22 @@ class MatchCaseSimilarCasesReporter {
 
     fetchSimilarCases(caseParams) {
 
-        let bevaluateScriptUrl = this.getCfg().similarCasesReporterUrl;
+        let similarCasesReporterUrl = this.getCfg().matchCase.similarCasesReporterUrl;
         let httpRequestData = this.assembleSimilarCasesHttpRequestData(caseParams);
         
-        fetch(bevaluateScriptUrl, httpRequestData).then( 
+        fetch(similarCasesReporterUrl, httpRequestData).then( 
             response => {
                 if(response.ok) 
                     response.json().then(
-                        report => this.getChief().updatePage(report["evaluation"])
+                        report => this.updatePage(report["evaluation"])
                     )
                 else 
-                    this.getChief().handleError("Failed to load similar cases"); 
+                    this.handleError({
+                        "errorMessage": "Failed to load similar cases",
+                        "url": similarCasesReporterUrl,
+                        "requestData": httpRequestData,
+                        "response": response
+                    }); 
             }
         )
     }

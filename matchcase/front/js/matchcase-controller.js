@@ -88,7 +88,6 @@ class MatchCaseForm {
             select.appendChild(option);
         }
 
-
         return this;
     }
 
@@ -135,9 +134,9 @@ class MatchCaseReport {
         this.chief = chief;
     }
 
-    displayCompanyValue(report) {
+    updateValueEstimate(estimate) {
         let spanValuation = document.getElementById("spanValuation");
-        spanValuation.innerHTML = report.evaluation.company_value.toFixed(2);
+        spanValuation.innerHTML = estimate.toFixed(2);
     }
 
     formatField(caze, fieldName) {
@@ -180,26 +179,26 @@ class MatchCaseReport {
 
         for(let field_name of field_names) {
             let id = "tdCase" + index + "_" + field_name;
-            td = document.getElementById(id);
+            let td = document.getElementById(id);
             if(!!td)
-                td.innerHTML = formatField(caze, field_name);
+                td.innerHTML = this.formatField(caze, field_name);
         }
 
     }
 
-    displayCases(report) {
-        displayCase(report.evaluation.similar_cases[0], 1);
-        displayCase(report.evaluation.similar_cases[1], 2);
-        displayCase(report.evaluation.similar_cases[2], 3);
+    updateSimilarCasesTable(similarCases) {
+        this.displayCase(similarCases[0], 1);
+        this.displayCase(similarCases[1], 2);
+        this.displayCase(similarCases[2], 3);
     }
 }
 
 
 class MatchCaseController {
 
-    constructor() {
+    constructor(chief) {
 
-        this.cfg = this.loadCfg();
+        this.chief = chief;
 
         this.caseForm = this.createCaseForm();
         this.caseReport = this.createCaseReport();
@@ -207,20 +206,19 @@ class MatchCaseController {
         this.similarCasesReporter = this.createSimilarCasesReporter();
     }
 
-    loadCfg() {
-
-        let base = "http://localhost/matchcase/mserv/"
-
-        let cfg = {
-            "directoryViewerUrl": base + "directory-viewer/script.py",
-            "similarCasesReporterUrl": base + "similar-cases-reporter/script.py"
-        }
-
-        return cfg;
+    getChief() {
+        return this.chief;
     }
 
     getCfg() {
-        return this.cfg;
+        return this.getChief().getCfg();
+    }
+
+    handleError(errorInfo) {
+        
+        this.getChief().handleError(errorInfo);
+        
+        return this;
     }
 
     createCaseForm() {
@@ -236,7 +234,7 @@ class MatchCaseController {
     }
 
     getCaseReport() {
-        return new this.caseReport;
+        return this.caseReport;
     }
 
     createDirectoryViewer() {
@@ -271,11 +269,11 @@ class MatchCaseController {
         return this;
     }
 
-    matchSimilarCases() {
+    matchCase() {
         
-        let companyParams = this.getCaseForm().getCompanyParams();
+        let companyParams = this.getCaseForm().getCaseParams();
         
-        this.similarCasesReporter().fetchSimilarCases(companyParams);
+        this.getSimilarCasesReporter().fetchSimilarCases(companyParams);
         
         return this;
     }

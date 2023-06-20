@@ -1,4 +1,4 @@
-// CompCase
+// MatchCase
 // Directory Viewer
 // Client library for JS
 
@@ -20,6 +20,17 @@ class MatchCaseDirectoryViewer {
 
     getChief() {
         return this.chief;
+    }
+
+    getCfg() {
+        return this.getChief().getCfg();
+    }
+
+    handleError(errorInfo) {
+        
+        this.getChief().handleError(errorInfo);
+        
+        return this;
     }
 
     getDirectoryCodes() {
@@ -111,15 +122,21 @@ class MatchCaseDirectoryViewer {
     }
 
     fetchDirectory(directoryCode) {
-
+        
+        let directoryViewerUrl = this.getCfg().matchCase.directoryViewerUrl;
         let httpRequestData = this.assembleDirectoryHttpRequestData(directoryCode);
 
-        fetch(this.getChief().getCfg().directoryViewerUrl, httpRequestData).then(
+        fetch(directoryViewerUrl, httpRequestData).then(
             response => {
                 if(response.ok) 
                     response.json().then(responseBody => this.setDirectory(directoryCode, responseBody))
                 else 
-                    console.log(`Failed to load a directory {directoryCode}.`)
+                    this.handleError({
+                        "errorMessage": `Failed to load a directory {directoryCode}.`,
+                        "url": directoryViewerUrl,
+                        "requestData": httpRequestData,
+                        "response": response
+                    }); 
             }
         );
 
