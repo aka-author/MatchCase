@@ -1,5 +1,7 @@
-// Corporate Portal
-// The main page features
+// System:      Consulting Company Website
+// Module:      Portal
+// Block:       Front-end
+// Component:   Class PageController
 
 class PageController {
 

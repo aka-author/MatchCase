@@ -6,22 +6,50 @@
 
 body {
     margin: 0;
+    font-family: sans-serif;
+    font-size: 10pt;
 }
 
 #imgLogo {
     height: 40pt;
-    margin: 5pt;
+    margin-left: 15pt;
+    margin-top: 5pt;
+    margin-bottom: 5pt;
 }
 
 #spanPageTitle {
-    padding-bottom: 5pt;
+    margin-left: 12pt;
     font-size: 45pt;
+    font-family: serif;
     font-style: italic;
+    white-space: nowrap;
 }
 
 #divPageHeader {
     height: 50pt;
     border-bottom: 4pt solid #b00c94;
+}
+
+@media screen and (max-width: 700px) {
+
+    #imgLogo {
+        display: none;
+    }
+    
+    #spanPageTitle {
+        margin-left: 0;
+        text-align: center;
+        font-size: 16pt;
+    }
+
+    #divPageHeader {
+        height: 20pt;
+        padding-top: 5pt;
+        background: #8b0b75;
+        color: white;
+        text-align: center;
+        font-weight: bold;
+    }
 }
 
 img.coverBlamba {
@@ -51,14 +79,109 @@ div.coverBlock {
 }
 
 #divPageCover {
-    display: inline-flexbox
+    display: inline-flexbox;
+    text-align: center;
+}
+
+
+/* Form */
+
+.form div {
+    display: table-row;
+}
+
+.form div label {
+    display: table-cell;
+    padding-top: 5pt;
+}
+
+.form div span {
+    display: table-cell;
+    padding-top: 5pt;
+    padding-left: 10pt;
+}
+
+
+/* Porducts */
+
+img.productPic {
+    height: 120pt;
+    border-radius: 5pt;
+}
+
+/* Functional block */
+
+h3.funcblockHeader {
+    margin: 0;
+}
+
+.funcblockBody {
+    margin-top: 10pt;
+}
+
+.funcblock {
+    display: block;
+    width: fit-content;
+    margin-top:  15pt;
+}
+
+
+/* Subsection */
+
+h2.subsectionHeader {
+    margin-bottom: 0;
+    padding-top: 15pt;
+    color: #8b0b75;
+    font-family: Special;
+}
+
+.subsectionColumn {
+    display: inline-flex;
+    flex-wrap: wrap;
+    margin-right: 30pt;
+}
+
+.subsectionColumn:last-child {
+    margin-right: 0pt;
+    flex-direction: column;
+}
+
+.subsectionBody {
+    display: inline-flexbox;
+}
+
+div.subsection {
+    padding-left: 20pt;
+    padding-right: 20pt;
+    padding-bottom: 20pt;
+    border-radius: 5pt;
+}
+
+
+/* Section */
+
+.section {
+    display: block;
+}
+
+
+/* Certain parts */
+
+#divMatchCase {
+    background: #f5f890;
 }
 
 #divRequestForContact {
-    padding-left: 5pt;
-    padding-right: 5pt;
-    border-radius: 3pt;
     background-color: rgb(158, 227, 159);
+}
+
+#divTodayProposals {
+    
+    
+}
+
+#divCallToAction {
+    display: block;
 }
 
 #divPageBody {
@@ -66,6 +189,9 @@ div.coverBlock {
     margin-left: auto;
     margin-top: 10pt;
     margin-right: auto;
+}
 
-    --text-align: center;
+#divPageFooter {
+    height: 50pt;
+    background-color: #8b0b75;
 }

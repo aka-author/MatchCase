@@ -1,8 +1,10 @@
 #!python3
 #encoding: utf-8
 
-# Google Sheets Viewer
-# CGI-script
+# System:   Consulting Company Website
+# Module:   MatchCase
+# Block:    Microservice google-sheets-viewer
+# File:     CGI-script
 
 
 import os

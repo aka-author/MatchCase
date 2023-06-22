@@ -1,6 +1,7 @@
-// MatchCase
-// Similar Cases Reporter
-// Client library for JS
+// System:      Consulting Company Website
+// Module:      MatchCase
+// Block:       Microservice similar-cases-reporter 
+// Components:  Client JS library for a front-end 
 
 
 class MatchCaseSimilarCasesReporter {

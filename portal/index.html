@@ -134,182 +134,301 @@
                     </div>
                 </div>
             </div>
-            <hr>
             <div 
-                id="divCallToAction">
+                id="divCallToAction"
+                class="section">
                 <div 
-                    id="divMatchCase">
-                    <h2>What Does Your Business Look Like Now?</h2>
-                    <div 
-                        id="divMatchCaseForm">
-                        <div 
-                            style="display: blick">
-                        <h3>Your Company</h3>
-                        <form> 
-                            <div>
-                                <label>Industry</label>
-                                <span>
-                                    <select 
-                                        id="selectIndustry"></select>
-                                </span>
+                    id="divMatchCase"
+                    class="subsection">
+                    <h2 class="subsectionHeader">What Does Your Business Look Like Now?</h2>
+                    <div
+                        id="divMatchCaseBody"
+                        class="subsectionBody">
+                        <div class="subsectionColumn">
+                            <div 
+                                id="divMatchCaseForm"
+                                class="funcblock">
+                                <h3
+                                    class="funcblockHeader">Your Company</h3>
+                                <div 
+                                    id="divMatchFormBody"
+                                    class="funcblockBody form">
+                                    <div>
+                                        <label>Industry</label>
+                                        <span>
+                                            <select 
+                                                id="selectIndustry"></select>
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <label>Country</label>
+                                        <span>
+                                            <select 
+                                                id="selectCountry"></select>
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <label>Founded in</label>
+                                        <span>
+                                            <input 
+                                                id="inputFoundedInYear" 
+                                                size="4em">
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <label>Specialization</label>
+                                        <span>
+                                            <select 
+                                                id="selectSpecialization"></select>
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <label>Num. of empl.</label>
+                                        <span>
+                                            <input 
+                                                id="inputNumberOfEmployees" 
+                                                size="4em">
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <label>Revenue, $M</label>
+                                        <span>
+                                            <input 
+                                                id="inputRevenue" 
+                                                size="4em">
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <label></label>
+                                        <span>
+                                            <input 
+                                                type="button" 
+                                                value="Compare!" 
+                                                onclick="GLOBAL_PAGE_CONTROLLER.matchCase()">
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
-                            <div>
-                                <label>Country</label>
-                                <span>
-                                    <select 
-                                        id="selectCountry"></select>
-                                </span>
-                            </div>
-                            <div>
-                                <label>Founded in</label>
-                                <span>
-                                    <input 
-                                        id="inputFoundedInYear" 
-                                        size="4em">
-                                </span>
-                            </div>
-                            <div>
-                                <label>Specialization</label>
-                                <span>
-                                    <select 
-                                        id="selectSpecialization"></select>
-                                </span>
-                            </div>
-                            <div>
-                                <label>Num. of empl.</label>
-                                <span>
-                                    <input 
-                                        id="inputNumberOfEmployees" 
-                                        size="4em">
-                                </span>
-                            </div>
-                            <div>
-                                <label>Revenue, $M</label>
-                                <span>
-                                    <input 
-                                        id="inputRevenue" 
-                                        size="4em">
-                                </span>
-                            </div>
-                            <div>
-                                <label></label>
-                                <span>
-                                    <input 
-                                        type="button" 
-                                        value="Compare!" 
-                                        onclick="GLOBAL_PAGE_CONTROLLER.matchCase()">
-                                </span>
-                            </div>
-                        </form>
                         </div>
-                    </div>
-                    <div 
-                        id="divMatchCaseReport">
                         <div 
-                            id="divMatchCaseReportInner">
-                            <div>
-                                <h3>Similar Cases</h3>
+                            id="divMatchCaseReport"
+                            class="subsectionColumn">
+                            <div 
+                                id="divSimilarCases"
+                                class="funcblock">
+                                <h3
+                                    class="funcblockHeader">Similar Cases</h3>
+                                <table 
+                                    id="tableMatchCase"
+                                    class="funcblockBody">
+                                    <thead>
+                                        <tr>
+                                            <td>Acquirer</td>
+                                            <td>Acquiree</td>
+                                            <td>Revenue, $M</td>
+                                            <td>Year</td>
+                                            <td>Price, $M</td>
+                                            <td>Info</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td 
+                                                id="tdCase1_acquirer_name"></td>
+                                            <td 
+                                                id="tdCase1_acquiree_name"></td>
+                                            <td 
+                                                id="tdCase1_acquiree_revenue" 
+                                                class="bevaluateCaseMoney"></td>
+                                            <td 
+                                                id="tdCase1_acquired_in"></td>
+                                            <td 
+                                                id="tdCase1_deal_price" 
+                                                class="bevaluateCaseMoney"></td>
+                                            <td 
+                                                id="tdCase1_deal_www" 
+                                                class="bevaluateCaseInfo">&nbsp;</td>
+                                        </tr>
+                                        <tr>
+                                            <td 
+                                                id="tdCase2_acquirer_name"></td>
+                                            <td 
+                                                id="tdCase2_acquiree_name"></td>
+                                            <td 
+                                                id="tdCase2_acquiree_revenue" 
+                                                class="bevaluateCaseMoney"></td>
+                                            <td 
+                                                id="tdCase2_acquired_in"></td>
+                                            <td 
+                                                id="tdCase2_deal_price" 
+                                                class="bevaluateCaseMoney"></td>
+                                            <td 
+                                                id="tdCase2_deal_www" 
+                                                class="bevaluateCaseInfo">&nbsp;</td>
+                                        </tr>
+                                        <tr>
+                                            <td 
+                                                id="tdCase3_acquirer_name"></td>
+                                            <td 
+                                                id="tdCase3_acquiree_name"></td>
+                                            <td 
+                                                id="tdCase3_acquiree_revenue" 
+                                                class="bevaluateCaseMoney"></td>
+                                            <td 
+                                                id="tdCase3_acquired_in"></td>
+                                            <td 
+                                                id="tdCase3_deal_price" 
+                                                class="bevaluateCaseMoney"></td>
+                                            <td 
+                                                id="tdCase3_deal_www" 
+                                                class="bevaluateCaseInfo">&nbsp;</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
-                            <table 
-                                id="tableMatchCase">
-                                <thead>
-                                    <tr>
-                                        <td>Acquirer</td>
-                                        <td>Acquiree</td>
-                                        <td>Revenue, $M</td>
-                                        <td>Year</td>
-                                        <td>Price, $M</td>
-                                        <td>Info</td>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td 
-                                            id="tdCase1_acquirer_name"></td>
-                                        <td 
-                                            id="tdCase1_acquiree_name"></td>
-                                        <td 
-                                            id="tdCase1_acquiree_revenue" 
-                                            class="bevaluateCaseMoney"></td>
-                                        <td 
-                                            id="tdCase1_acquired_in"></td>
-                                        <td 
-                                            id="tdCase1_deal_price" 
-                                            class="bevaluateCaseMoney"></td>
-                                        <td 
-                                            id="tdCase1_deal_www" 
-                                            class="bevaluateCaseInfo">&nbsp;</td>
-                                    </tr>
-                                    <tr>
-                                        <td 
-                                            id="tdCase2_acquirer_name"></td>
-                                        <td 
-                                            id="tdCase2_acquiree_name"></td>
-                                        <td 
-                                            id="tdCase2_acquiree_revenue" 
-                                            class="bevaluateCaseMoney"></td>
-                                        <td 
-                                            id="tdCase2_acquired_in"></td>
-                                        <td 
-                                            id="tdCase2_deal_price" 
-                                            class="bevaluateCaseMoney"></td>
-                                        <td 
-                                            id="tdCase2_deal_www" 
-                                            class="bevaluateCaseInfo">&nbsp;</td>
-                                    </tr>
-                                    <tr>
-                                        <td 
-                                            id="tdCase3_acquirer_name"></td>
-                                        <td 
-                                            id="tdCase3_acquiree_name"></td>
-                                        <td 
-                                            id="tdCase3_acquiree_revenue" 
-                                            class="bevaluateCaseMoney"></td>
-                                        <td 
-                                            id="tdCase3_acquired_in"></td>
-                                        <td 
-                                            id="tdCase3_deal_price" 
-                                            class="bevaluateCaseMoney"></td>
-                                        <td 
-                                            id="tdCase3_deal_www" 
-                                            class="bevaluateCaseInfo">&nbsp;</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <h3>Our Humble Estimates</h3>
-                            <div>
-                                <span>Your possible company value, $M: </span>
-                                <span 
-                                    id="spanValuation"></span>
+                            <div 
+                                id="divCaseEstimates"
+                                class="funcblock">
+                                <h3
+                                    class="funcblockHeader">Our Humble Estimates</h3>
+                                <div
+                                    id="divCaseEstimatesBody"
+                                    class="funcblockBody">
+                                    <span>Your possible company value, $M: </span>
+                                    <span 
+                                        id="spanValuation"></span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div 
-                    id="divRequestForContact">
-                    <h2>Contact Us to Start Getting Global</h2>
-                    <div>
-                        <label>Your company name</label><input>
-                        <label>Web-site</label><input>
+                    id="divRequestForContact"
+                    class="subsection">
+                    <h2
+                        class="subsectionHeader">Contact Us to Start Getting Global</h2>
+                    <div
+                        class="subsectionBody">
+                        <div
+                            class="subsectionColumn">
+                            <div
+                                class="funcblock">
+                                <h3
+                                    class="funcblockHeader">Tell Us More About Your Company</h3>
+                                <div 
+                                    class="funcblockBody form">
+                                    <div>
+                                        <label>Your company name</label>
+                                        <span><input></span>
+                                    </div>
+                                    <div>
+                                        <label>Web-site</label>
+                                        <span><input></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            class="subsectionColumn">
+                            <div
+                                class="funcblock">
+                                <h3
+                                    class="funcblockHeader">How Can We Contact You?</h3>
+                                    <div 
+                                        class="funcblockBody form">            
+                                        <div>
+                                            <label>Your name</label>
+                                            <span><input></span>
+                                        </div>
+                                        <div>
+                                            <label>E-mail</label>
+                                            <span><input></span>
+                                        </div>
+                                        <div>
+                                            <label>Phone number</label>
+                                            <span><input></span>
+                                        </div>
+                                        <div>
+                                            <label></label>
+                                            <span>
+                                                <input 
+                                                    type="button" 
+                                                    value="Start getting global!">
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <label>Your name</label><input>
-                        <label>E-mail</label><input>
-                        <label>Phone number</label><input>
-                    </div>
-                    <div>
-                        <input 
-                            type="button" 
-                            value="Get global">
+                </div>
+                <div 
+                    id="divProposals"
+                    class="section">
+                    <div
+                        id="divTodayProposals"
+                        class="subsection">
+                        <h2
+                            class="subsectionHeader">Products and Services</h2>
+                        <div
+                            class="subsectionBody">
+                            <!--
+                            <div class="subsectionColumn">
+                                <div
+                                    class="funcblock">
+                                    <img src="img/left-arrow-2.svg" width="20pt" style="margin-bottom: -60pt;">
+                                </div>
+                            </div>
+                            -->
+                            <div class="subsectionColumn">
+                                <div
+                                    class="funcblock">
+                                    <h3
+                                        class="funcblockHeader">Podcast</h3>
+                                    <div
+                                        class="funcblockBody">
+                                        <img src="img/headset01.jpg" class="productPic">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="subsectionColumn">
+                                <div
+                                    class="funcblock">
+                                    <h3
+                                        class="funcblockHeader">Catalog</h3>
+                                    <div
+                                        class="funcblockBody">
+                                        <img src="img/corp01.jpg" class="productPic">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="subsectionColumn">
+                                <div class="subsectionColumn">
+                                    <div
+                                        class="funcblock">
+                                        <h3
+                                            class="funcblockHeader">Support Team</h3>
+                                        <div
+                                            class="funcblockBody">
+                                            <img src="img/operators01.jpg" class="productPic">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--
+                            <div class="subsectionColumn" style="width: 20pt">
+                                <div
+                                    class="funcblock">
+                                    <img src="img/right-arrow-2.svg" width="20pt" style="margin-bottom: -60pt;">
+                                </div>
+                            </div>
+                            -->
+                        </div>
                     </div>
                 </div>
             </div>
-            <hr>
-            <div 
-                id="divProposals">
-                
-            </div>
-        </div>
+            
+        </div>    
         <div id="divPageFooter">
 
         </div>

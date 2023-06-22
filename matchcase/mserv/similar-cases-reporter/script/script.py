@@ -1,8 +1,10 @@
-#!C:/Program Files/Python37/python
+#!python3
 #encoding: utf-8
 
-# Similar Cases Viewer
-# CGI-script
+# System:   Consulting Company Website
+# Module:   MatchCase
+# Block:    Microservice similar-cases-reporter
+# File:     CGI-script
 
 
 import os
@@ -47,8 +49,6 @@ def parse_company_params(http_request_body: str) -> dict:
     }
     """
     
-
-    
     request_data = json.loads(http_request_body)
 
     company_params = {
@@ -60,7 +60,6 @@ def parse_company_params(http_request_body: str) -> dict:
         "revenue": safe_float(request_data.get("revenue"))
     }
     
-
     return company_params
 
 

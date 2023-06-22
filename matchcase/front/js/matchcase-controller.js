@@ -1,5 +1,7 @@
-// MatchCase
-// The main script
+// System:      Consulting Company Website
+// Module:      MatchCase
+// Block:       Module front-end
+// Components:  MatchCaseController and auxiliary classes
 
 
 class MatchCaseForm {
