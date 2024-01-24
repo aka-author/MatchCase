@@ -16,12 +16,12 @@ class MatchCaseForm {
     getFieldsDomObjects() {
 
         this.selectCountry = this.getSelectCountryDomObject();
+        this.selectYearFounded = this.getSelectYearFoundedDomObject();
         this.selectIndustry = this.getSelectIndustryDomObject();
         this.selectSpecialization = this.getSelectSpecializationDomObject();
-        this.inputFoundedInYear = this.getInputFoundedInYearDomObject();
         this.inputNumberOfEployees = this.getInputNumberOfEmployeesDomObject();
         this.inputRevenue = this.getInputRevenueDomObject();
-
+        
         return this;
     }
 
@@ -29,8 +29,16 @@ class MatchCaseForm {
         return document.getElementById("selectCountry");
     }
     
+    getSelectYearFoundedDomObject() {
+        return document.getElementById("selectYearFounded");
+    }
+
     getCountryCode() {
         return this.selectCountry.value;
+    }
+
+    getSelectYearFoundedDomObject() {
+        return document.getElementById("selectYearFounded");
     }
 
     getSelectIndustryDomObject() {
@@ -48,13 +56,9 @@ class MatchCaseForm {
     getSpecializationCode() {
         return this.selectSpecialization.value;
     }
-
-    getInputFoundedInYearDomObject() {
-        return document.getElementById("inputFoundedInYear");
-    }
     
-    getFoundedInYear() {
-        return parseInt(this.inputFoundedInYear.value);
+    getYearFounded() {
+        return parseInt(this.selectYearFounded.value);
     }
 
     getInputNumberOfEmployeesDomObject() {
@@ -100,6 +104,19 @@ class MatchCaseForm {
         return this;
     }
 
+    updateSelectYearFounded() {
+
+        const currYear = 2024;
+
+        const years = [];
+
+        for(let year = currYear; year >= currYear - 20; year--) 
+            years.push({"year": year.toString()});
+        
+        this.updateSelect(this.selectYearFounded, years, "year", "year");
+
+    }
+
     updateSelectIndustry(industries) {
 
         this.updateSelect(this.selectIndustry, industries, "industry_code", "industry_name");
@@ -119,7 +136,7 @@ class MatchCaseForm {
         let caseParams = {
             "industry_code": this.getIndustryCode(),
             "country_code": this.getCountryCode(),
-            "founded_in": this.getFoundedInYear(),
+            "founded_in": this.getYearFounded(),
             "specialization_code": this.getSpecializationCode(),
             "num_employees": this.getNumberOfEmployees(),
             "revenue": this.getRevenue()
@@ -259,12 +276,18 @@ class MatchCaseController {
 
         if(!!updateData.countries) 
             this.getCaseForm().updateSelectCountry(updateData.countries);
+        
+        this.getCaseForm().updateSelectYearFounded();
+        
         if(!!updateData.industries)
             this.getCaseForm().updateSelectIndustry(updateData.industries);
+        
         if(!!updateData.specializations)
             this.getCaseForm().updateSelectSpecialization(updateData.specializations);
+        
         if(!!updateData.valueEstimate)
             this.getCaseReport().updateValueEstimate(updateData.valueEstimate);
+        
         if(!!updateData.similarCases)
             this.getCaseReport().updateSimilarCasesTable(updateData.similarCases);
         
