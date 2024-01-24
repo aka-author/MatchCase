@@ -33,6 +33,10 @@ class PageController {
         return this.matchCaseController;
     }
 
+    updateSpecializationSelect() {
+        this.matchCaseController.updateSpecializationSelect();
+    }
+
     matchCase() {
 
         this.getMatchCaseController().matchCase();

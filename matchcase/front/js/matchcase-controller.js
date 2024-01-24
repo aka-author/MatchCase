@@ -88,7 +88,12 @@ class MatchCaseForm {
     }
 
     updateSelect(select, values, valuePropName="code", wordingPropName="wording") {
+
+        while(select.firstChild)
+            select.removeChild(select.firstChild);
+
         select.appendChild(this.createOptionDomObject(null, "-- Select --"));
+
         for(let value of values) {
             let option = this.createOptionDomObject(value[valuePropName], value[wordingPropName]);
             select.appendChild(option);
@@ -125,9 +130,7 @@ class MatchCaseForm {
     }
 
     updateSelectSpecialization(specializations) {
-
         this.updateSelect(this.selectSpecialization, specializations, "specialization_code", "specialization_name");
-
         return this;
     }
 
@@ -272,6 +275,13 @@ class MatchCaseController {
         return this.similarCasesReporter;
     }
 
+    updateSpecializationSelect() {
+        const industryCode = this.caseForm.getIndustryCode();
+        const allSpecializations = this.directoryViewer.getSpecializations();
+        const relevantSpecializations = allSpecializations.filter(s => s.industry_code === industryCode);
+        this.getCaseForm().updateSelectSpecialization(relevantSpecializations);
+    }
+
     updatePage(updateData) {
 
         if(!!updateData.countries) 
@@ -282,8 +292,7 @@ class MatchCaseController {
         if(!!updateData.industries)
             this.getCaseForm().updateSelectIndustry(updateData.industries);
         
-        if(!!updateData.specializations)
-            this.getCaseForm().updateSelectSpecialization(updateData.specializations);
+        this.updateSpecializationSelect();
         
         if(!!updateData.valueEstimate)
             this.getCaseReport().updateValueEstimate(updateData.valueEstimate);
