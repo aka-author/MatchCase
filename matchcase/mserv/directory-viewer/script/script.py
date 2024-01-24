@@ -96,6 +96,7 @@ def fetch_specializations(lang_code: str) -> dict:
 
     directory["specializations"] = [{
             "specialization_code": specialization.get("specialization_code"),
+            "industry_code": specialization.get("industry_code"),
             "specialization_name": specialization.get(lang_code) 
         } for specialization in specializations]
 
