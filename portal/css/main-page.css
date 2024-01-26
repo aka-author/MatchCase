@@ -1,8 +1,354 @@
+:root {
+    --border-color:                             rgba(41, 39, 39, 0.898);
+    --altruist-color:                           #177245;
+    --egoist-color:                             #950204;
+
+    --panel-width:                              460px;
+    --panel-margin:                             20px;
+    --panel-border-width:                       10px;
+
+    --flask-border-radius:                      240px;
+
+    --cp-width:                                 var(--panel-width);
+    --cp-height:                                var(--panel-width);
+    --cp-border-radius:                         15px;
+    --cp-tab-shortcut-font-size:                10pt;
+    --cp-form-field-block-margin-top:           var(--panel-margin);
+    --cp-form-field-block-header-font-size:     9pt;
+    --cp-form-field-padding-top:                8pt;
+    --cp-form-field-padding-bottom:             3pt;
+    --cp-form-field-font-size:                  8.5pt;
+        
+}
 
 @font-face {
 	font-family: 'Special';
 	src: url('FontsFree-Net-Biome-W04-Bold.ttf') format('truetype');
  }
+
+ #imgLogo {
+    height: 40pt;
+    margin-left: 15pt;
+    margin-top: 5pt;
+    margin-bottom: 5pt;
+}
+
+#spanPageTitle {
+    margin-left: 12pt;
+    font-size: 45pt;
+    font-family: serif;
+    font-style: italic;
+    white-space: nowrap;
+}
+
+#divPageHeader {
+    height: 50pt;
+    border-bottom: 4pt solid #b00c94;
+}
+
+@media screen and (max-width: 700px) {
+
+    #imgLogo {
+        display: none;
+    }
+    
+    #spanPageTitle {
+        margin-left: 0;
+        text-align: center;
+        font-size: 16pt;
+    }
+
+    #divPageHeader {
+        height: 20pt;
+        padding-top: 5pt;
+        background: #8b0b75;
+        color: white;
+        text-align: center;
+        font-weight: bold;
+    }
+}
+
+span.cpTabShortcut {
+    margin-right: 5pt;
+    font-size: var(--cp-tab-shortcut-font-size);
+    font-weight: bold;
+}
+
+#divTabShortcuts {
+    margin-top: var(--panel-margin);
+    margin-left: var(--panel-margin);
+    margin-bottom: 0;
+}
+
+@media screen and (max-width: 550px) {
+    #divTabShortcuts {
+        margin-left: 0;
+    }
+}
+
+div.cpFormFieldBlockHeader h2 {
+    margin: 0;
+    font-size: var(--cp-form-field-block-header-font-size);
+}
+
+div.cpFormFieldBlockHeader {
+    margin: 0;
+}
+
+label {
+    display: table-cell;
+    min-width: calc(var(--panel-width)*0.4);
+    max-width: calc(var(--panel-width)*0.6);
+    padding-top: var(--cp-form-field-padding-top);
+    padding-bottom: var(--cp-form-field-padding-bottom);
+    border-bottom: 1px var(--border-color) dotted;
+}
+
+@media screen and (max-width: 550px) {
+    label {
+        width: auto;
+    }
+}
+
+input, select {
+    font-family: monospace;
+    font-size: var(--cp-form-field-font-size);
+}
+
+span.input {
+    display: table-cell;
+    padding-left: var(--panel-margin);
+    padding-bottom: var(--cp-form-field-padding-bottom);
+    vertical-align: bottom;
+    font-size: var(--cp-form-field-font-size);
+}
+
+@media screen and (max-width: 550px) {
+    span.input {
+        width: 0px;
+    }
+}
+
+label.outputNumeric {
+    display: table-cell;
+    width: 20em;
+    padding-top: var(--cp-form-field-padding-top);
+    padding-bottom: var(--cp-form-field-padding-bottom);
+    border-bottom: 1px var(--border-color) dotted;
+}
+
+span.outputNumeric, bevaluateCaseMoney {
+    display: table-cell;
+    width: 4em;
+    padding-left: calc(2*var(--block-main-margin));
+    padding-bottom: 3pt;
+    text-align: right;
+    vertical-align: bottom;
+    font-family: monospace;
+    font-size: var(--panel-main-font-size);
+}
+
+table {
+    width: calc(100% - 10pt);
+    margin-top: 5pt;
+    font-size: var(--cp-form-field-font-size);
+}
+
+thead td {
+    font-weight: body;
+
+}
+
+span.cpPromptIcon {
+    cursor: help;
+    font-size: var(--panel-main-font-size);
+}
+
+@media screen and (max-width: 550px) {
+    span.cpPromptIcon {
+        display: none;
+    }
+}
+
+div.cpInfoPrompt {
+    font-size: var(--panel-prompt-font-size);
+}
+
+.cpTextControl {
+    padding-left: 3pt;
+    font-family: monospace;
+    font-size: var(--cp-form-field-font-size);
+    color: blue;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+div.cpFormField {
+    display: table-row;
+    font-size: var(--cp-form-field-font-size);
+}
+
+div.cpFormFieldBlockBody {
+    display: table;
+    margin-top: 0;
+}
+
+@media screen and (max-width: 550px) {
+    div.cpFormFieldBlockBody {
+        width: 100%;
+    }
+}
+
+div.cpFormFieldBlock {
+    margin-top: var(--cp-form-field-block-margin-top);
+}
+
+input[type="button"] {
+    margin-right: var(--block-main-margin);
+    font-family: sans-serif;
+}
+
+img.buttonIcon {
+    vertical-align: middle; 
+    width: 13pt; 
+    cursor: pointer;
+}
+
+div.cpTab {
+    margin-left: var(--panel-margin);
+}
+
+@media screen and (max-width: 550px) {
+    div.cpTab {
+        width: 100%;
+        margin-top: 0;
+        margin-left: 0;
+    }
+}
+
+#spanStepNumber {
+    padding-left: 3pt;
+    font-family: monospace;
+    font-size: var(--cp-form-field-font-size);
+    color: blue;
+    white-space: nowrap;
+}
+
+
+div.cpButtonBlock {
+    margin-left: var(--panel-margin);
+    margin-top: var(--panel-margin);
+    margin-bottom: 5pt;
+}
+
+@media screen and (max-width: 550px) {
+    div.cpButtonBlock {
+        margin-left: 0;   
+    }     
+}
+
+#divControlPanel {
+    display: block;
+    width: var(--cp-width);
+    min-height: var(--cp-height);
+    --margin-left: var(--panel-margin);
+    margin-left: auto;
+    margin-top: var(--panel-margin);
+    --margin-right: var(--panel-margin);
+    margin-right: auto;
+    margin-bottom: calc(2*var(--panel-main-margin));
+    border: var(--panel-border-width) var(--border-color) solid;
+    border-radius: var(--cp-border-radius);
+    vertical-align: top;
+    text-align: left;
+}
+
+@media screen and (max-width: 550px) {
+    #divControlPanel {
+        width: auto;
+        margin-left: auto;
+        margin-right: auto;
+        --margin-left: 5vw;
+        --margin-right: 5vw;
+        margin-bottom: var(--panel-main-margin);
+        text-align: left;
+        border: none;
+    }
+}
+
+#divConsole {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+@media screen and (max-width: 550px) {
+    #divConsole {
+        width: 100%;
+    }
+}
+
+#divConsole {
+    margin-bottom: calc(var(--panel-margin)/2);
+}
+
+body {
+    margin: 0;
+    font-family: sans-serif;
+    overflow-x: hidden;
+}
+
+@media screen and (max-width: 550px) {
+    body {
+        margin: 0;
+        background-color: antiquewhite;
+    }
+}
+
+h1 {
+    margin-bottom: 0;
+    padding-top: 15pt;
+    text-align: center;
+    color: #8b0b75;
+    font-family: Special;
+    font-size: 18pt;
+
+}
+
+.subsectionColumn {
+    display: inline-flex;
+    flex-wrap: wrap;
+    margin-right: 30pt;
+}
+
+.subsectionColumn:last-child {
+    margin-right: 0pt;
+    flex-direction: column;
+}
+
+.subsectionBody {
+    display: inline-flexbox;
+}
+
+div.subsection {
+    padding-left: 20pt;
+    padding-right: 20pt;
+    padding-bottom: 20pt;
+    border-radius: 5pt;
+}
+
+.section {
+    display: block;
+}
+
+#divPageBody {
+    max-width: calc(4.5*150pt);
+    margin-left: auto;
+    margin-top: 10pt;
+    margin-right: auto;
+}
+
+/*
 
 body {
     margin: 0;
@@ -84,7 +430,7 @@ div.coverBlock {
 }
 
 
-/* Form */
+
 
 .form div {
     display: table-row;
@@ -102,14 +448,14 @@ div.coverBlock {
 }
 
 
-/* Porducts */
+
 
 img.productPic {
     height: 120pt;
     border-radius: 5pt;
 }
 
-/* Functional block */
+
 
 h3.funcblockHeader {
     margin: 0;
@@ -126,7 +472,7 @@ h3.funcblockHeader {
 }
 
 
-/* Subsection */
+
 
 h2.subsectionHeader {
     margin-bottom: 0;
@@ -158,17 +504,17 @@ div.subsection {
 }
 
 
-/* Section */
+
 
 .section {
     display: block;
 }
 
 
-/* Certain parts */
+
 
 #divMatchCase {
-    background: #f5f890;
+    background: antiquewhite;
 }
 
 #divRequestForContact {
@@ -195,3 +541,5 @@ div.subsection {
     height: 50pt;
     background-color: #8b0b75;
 }
+
+*/

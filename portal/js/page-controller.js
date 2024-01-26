@@ -3,6 +3,8 @@
 // Block:       Front-end
 // Component:   Class PageController
 
+GLOBAL_CONTROL_PANEL = null;
+
 class PageController {
 
     constructor() {
@@ -10,6 +12,8 @@ class PageController {
         this.cfg = this.loadCfg();
         
         this.matchCaseController = this.createMatchCaseController(this);
+        this.controlPanel = new ControlPanel(this);
+        GLOBAL_CONTROL_PANEL = this.controlPanel;
     }
 
     loadCfg() {        
@@ -40,7 +44,8 @@ class PageController {
     matchCase() {
 
         this.getMatchCaseController().matchCase();
-        
+        selectTab("Cases");
+
         return this;
     }
 }

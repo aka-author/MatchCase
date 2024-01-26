@@ -287,12 +287,14 @@ class MatchCaseController {
         if(!!updateData.countries) 
             this.getCaseForm().updateSelectCountry(updateData.countries);
         
-        this.getCaseForm().updateSelectYearFounded();
+        if(!!updateData.countries)
+            this.getCaseForm().updateSelectYearFounded();
         
         if(!!updateData.industries)
             this.getCaseForm().updateSelectIndustry(updateData.industries);
         
-        this.updateSpecializationSelect();
+        if(!!updateData.specializations)
+            this.updateSpecializationSelect();
         
         if(!!updateData.valueEstimate)
             this.getCaseReport().updateValueEstimate(updateData.valueEstimate);
