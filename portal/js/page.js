@@ -38,7 +38,30 @@ class PageController {
     }
 
     updateSpecializationSelect() {
+
         this.matchCaseController.updateSpecializationSelect();
+
+        const industryCode = this.matchCaseController.caseForm.getIndustryCode();
+        const divIndustryTellUsMore = document.getElementById("divIndustryTellUsMore");
+        const divSpecializationTellUsMore = document.getElementById("divSpecializationTellUsMore");
+
+        if(industryCode === "Misc.") {
+            divIndustryTellUsMore.style.display = "";
+            divSpecializationTellUsMore.style.display = "";
+        } else {
+            divIndustryTellUsMore.style.display = "none";
+            divSpecializationTellUsMore.style.display = "none";
+        }
+    }
+
+    checkSpecialization() {
+        const specializationCode = this.matchCaseController.caseForm.getSpecializationCode();
+        const divTellUsMore = document.getElementById("divSpecializationTellUsMore");
+        divTellUsMore.style.display = specializationCode.includes("Misc") ? "" : "none";
+    }
+
+    startComparing() {
+        selectTab("Basics");
     }
 
     matchCase() {

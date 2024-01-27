@@ -8,14 +8,12 @@
 
         <meta charset="utf-8"/>
         
-        <title>GettinGlobal Consulting</title>
+        <title>Compare Your Business</title>
 
         <link 
             rel="stylesheet" 
             href="css/main-page.css">
-        <link 
-            rel="stylesheet" 
-            href="css/matchcase.css">
+        
         <script
             src="cfg/cfg.js"></script>
         
@@ -34,7 +32,8 @@
             src="../matchcase/front/js/matchcase-controller.js"></script>
 
         <script
-            src="js/page-controller.js"></script>
+            src="js/page.js"></script>
+
         <script>
             var GLOBAL_PAGE_CONTROLLER = null;
             function initPage() {
@@ -44,18 +43,21 @@
     </head>
     <body 
         onload="initPage()">
+
         <div 
             id="divPageHeader">
+            
             <img 
                 id="imgLogo" 
                 src="img/lamplogo-02.png">
-            
+
+            <div id="pageTitle">Compare Your Business</div>
+
         </div>
+
         <div 
             id="divPageBody">
             
-            <h1>What Does Your Business Look Like Now?</h1>
-
             <div 
                 id="divControlPanel">
                     
@@ -63,29 +65,67 @@
                     id="divTabShortcuts"
                     style="display: block;">
                     <span 
+                        id="spanTabShortcutIntro"
+                        class="cpTabShortcut"
+                        onclick="selectTab('Intro')"
+                        style="text-decoration: none; cursor: default">What's this?</span>
+                    <span 
                         id="spanTabShortcutBasics"
                         class="cpTabShortcut"
                         onclick="selectTab('Basics')"
-                        style="text-decoration: none; cursor: default">Basis</span>
+                        style="text-decoration: underline; cursor: pointer">Your company</span>
                     <span 
                         id="spanTabShortcutCases"
                         class="cpTabShortcut"
                         onclick="selectTab('Cases')"
-                        style="text-decoration: underline; cursor: pointer">Cases</span>
+                        style="text-decoration: underline; cursor: pointer">Our vibes</span>
+                </div>
+
+                <div 
+                    id="divTabIntro"
+                    class="cpTab"
+                    style="display: block">
+
+                        <h2>Service Overview</h2>
+                        <p>Our platform facilitates swift and insightful comparisons between 
+                            businesses, leveraging a comprehensive database of companies that 
+                            have experienced acquisition. Specifically designed for startups 
+                            and small to medium-sized intellectual enterprises, our service 
+                            offers valuable perspectives on potential business trajectories.</p>
+
+                        <h2>Target Audience</h2>
+                        <p>Entrepreneurs and decision-makers in startups and small to medium-sized 
+                            intellectual businesses seeking nuanced insights into their industry 
+                            landscape and growth possibilities.</p>
+
+                        <h2>Disclaimer</h2>
+                        <p>It's important to clarify that our service does not engage in traditional 
+                            business evaluations. Instead, we provide informative perspectives through 
+                            comparisons with acquired companies, focusing on insights rather than 
+                            formal assessments.</p>
+                    </p>
+
+                    <hr>
+
+                    <p>
+                        <span 
+                            id="spanStartComparing"
+                            onclick="GLOBAL_PAGE_CONTROLLER.startComparing()">Start comparing your business &gt;&gt;&gt;</span>
+                    </p>
+
                 </div>
 
                 <div 
                     id="divTabBasics"
                     class="cpTab"
-                    style="display: block">
+                    style="display: none">
                 
                     <div 
-                        id="divMatchCaseForm"
                         class="cpFormFieldBlock">
                         
                         <div
                             class="cpFormFieldBlockHeader">
-                            <h2>Basic Parameters</h2>
+                            <h2>General</h2>
                         </div>
                         
                         <div 
@@ -105,7 +145,22 @@
                                         id="selectYearFounded"></select>
                                 </span>
                             </div>
-                            <div class="cpFormField">
+                        </div>
+                    </div>
+                
+                    <div 
+                        class="cpFormFieldBlock">
+                        
+                        <div
+                            class="cpFormFieldBlockHeader">
+                            <h2>Profile</h2>
+                        </div>
+                        
+                        <div 
+                            id="divMatchFormBody"
+                            class="cpFormFieldBlockBody">
+                            <div 
+                                class="cpFormField">
                                 <label>Industry</label>
                                 <span>
                                     <select 
@@ -113,19 +168,56 @@
                                         onchange="GLOBAL_PAGE_CONTROLLER.updateSpecializationSelect()"></select>
                                 </span>
                             </div>
-                            <div class="cpFormField">
+                            <div
+                                id="divIndustryTellUsMore" 
+                                class="cpFormField" 
+                                style="display: none">
+                                <label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tell us more, please</label>
+                                <span>
+                                    <input 
+                                        id="inputIndustry">
+                                </span>
+                            </div>
+                            <div 
+                                class="cpFormField">
                                 <label>Specialization</label>
                                 <span>
                                     <select 
-                                        id="selectSpecialization"></select>
+                                        id="selectSpecialization"
+                                        onchange="GLOBAL_PAGE_CONTROLLER.checkSpecialization()"></select>
                                 </span>
                             </div>
+                            <div
+                                id="divSpecializationTellUsMore" 
+                                class="cpFormField" 
+                                style="display: none">
+                                <label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tell us more, please</label>
+                                <span>
+                                    <input 
+                                        id="inputSpecialization">
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                
+                    <div 
+                        class="cpFormFieldBlock">
+                        
+                        <div
+                            class="cpFormFieldBlockHeader">
+                            <h2>Metrics</h2>
+                        </div>
+                        
+                        <div 
+                            id="divMatchFormBody"
+                            class="cpFormFieldBlockBody">
                             <div class="cpFormField">
-                                <label>Num. of empl.</label>
+                                <label>Number of employees</label>
                                 <span>
                                     <input 
                                         id="inputNumberOfEmployees" 
-                                        size="4em">
+                                        size="4em"
+                                        oninput="validatePositiveInt('inputNumberOfEmployees')">
                                 </span>
                             </div>
                             <div class="cpFormField">
@@ -133,12 +225,24 @@
                                 <span>
                                     <input 
                                         id="inputRevenue" 
-                                        size="4em">
+                                        size="4em"
+                                        oninput="validateNonNegativeReal('inputRevenue')">
                                 </span>
                             </div>
                             
                         </div>
                     </div>
+
+                    <div 
+                        class="cpButtonBlock">
+                        <span>
+                            <input 
+                                type="button" 
+                                value="Compare!" 
+                                onclick="GLOBAL_PAGE_CONTROLLER.matchCase()">
+                        </span>
+                    </div>
+
                 </div>
 
                 <div 
@@ -251,16 +355,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
-            
-                <div 
-                    class="cpButtonBlock">
-                    <span>
-                        <input 
-                            type="button" 
-                            value="Compare!" 
-                            onclick="GLOBAL_PAGE_CONTROLLER.matchCase()">
-                    </span>
                 </div>
 
             </div>

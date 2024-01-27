@@ -33,39 +33,73 @@
     margin-bottom: 5pt;
 }
 
-#spanPageTitle {
-    margin-left: 12pt;
-    font-size: 45pt;
-    font-family: serif;
-    font-style: italic;
-    white-space: nowrap;
+#pageTitle {
+    position: absolute;
+    left: 60pt;
+    top: 24pt;
+    margin: 0;
+    color: #8b0b75;
+    font-family: Special;
+    font-size: 18pt;
 }
 
 #divPageHeader {
+    position: relative;
     height: 50pt;
     border-bottom: 4pt solid #b00c94;
 }
 
-@media screen and (max-width: 700px) {
+@media screen and (max-width: 550px) {
 
     #imgLogo {
         display: none;
     }
     
-    #spanPageTitle {
-        margin-left: 0;
+    #pageTitle {
+        position: relative;
+        left: 0;
+        top: 0;
+        padding-top: 3pt;
         text-align: center;
-        font-size: 16pt;
+        font-family: Special;
+        font-size: 14pt;
+        color: #ffffff;
     }
 
     #divPageHeader {
-        height: 20pt;
-        padding-top: 5pt;
+        height: 25pt;
         background: #8b0b75;
         color: white;
         text-align: center;
         font-weight: bold;
     }
+}
+
+h2 {
+    margin-top: 15pt;
+    margin-bottom: 0pt;
+    font-size: 9pt;
+}
+
+p {
+    margin-top: 5pt;
+    margin-right: 15pt;
+    line-height: 12pt;
+    font-size: 8pt;
+}
+
+hr {
+    margin-top: 15pt;
+    margin-bottom: 15pt;
+    margin-right: 15pt;
+}
+
+#spanStartComparing {
+    font-size: 10pt;
+    font-weight: bold;
+    text-decoration: underline;
+    color:#8b0b75;
+    cursor: pointer;
 }
 
 span.cpTabShortcut {
@@ -106,7 +140,8 @@ label {
 
 @media screen and (max-width: 550px) {
     label {
-        width: auto;
+        min-width: calc(var(--panel-width)*0.2);
+        max-width: calc(var(--panel-width)*0.6);
     }
 }
 
@@ -148,15 +183,40 @@ span.outputNumeric, bevaluateCaseMoney {
     font-size: var(--panel-main-font-size);
 }
 
+thead td {
+    white-space: nowrap;
+    font-weight: bold;
+}
+
+td {
+  border-bottom: 1px dotted black;  
+}
+
+td.bevaluateCaseMoney {
+    text-align: right;
+}
+
+td.bevaluateCaseInfo {
+    text-align: center;
+}
+
+td.bevaluateCaseInfo a:link {
+    text-decoration: none;
+}
+
+td.bevaluateCaseInfo a:visited {
+    text-decoration: none;
+}
+
+td.bevaluateCaseInfo a:hover {
+    color: crimson;
+    text-decoration: none;
+}
+
 table {
     width: calc(100% - 10pt);
     margin-top: 5pt;
     font-size: var(--cp-form-field-font-size);
-}
-
-thead td {
-    font-weight: body;
-
 }
 
 span.cpPromptIcon {
@@ -234,7 +294,6 @@ div.cpTab {
     white-space: nowrap;
 }
 
-
 div.cpButtonBlock {
     margin-left: var(--panel-margin);
     margin-top: var(--panel-margin);
@@ -251,45 +310,29 @@ div.cpButtonBlock {
     display: block;
     width: var(--cp-width);
     min-height: var(--cp-height);
-    --margin-left: var(--panel-margin);
-    margin-left: auto;
+    margin-left: calc(50vw - var(--cp-width)/2 - var(--panel-border-width));
     margin-top: var(--panel-margin);
-    --margin-right: var(--panel-margin);
     margin-right: auto;
     margin-bottom: calc(2*var(--panel-main-margin));
     border: var(--panel-border-width) var(--border-color) solid;
     border-radius: var(--cp-border-radius);
-    vertical-align: top;
     text-align: left;
 }
 
 @media screen and (max-width: 550px) {
     #divControlPanel {
         width: auto;
-        margin-left: auto;
-        margin-right: auto;
-        --margin-left: 5vw;
-        --margin-right: 5vw;
+        margin-left: 5vw;
+        margin-right: 5vw;
         margin-bottom: var(--panel-main-margin);
         text-align: left;
         border: none;
     }
 }
 
-#divConsole {
-    margin-left: auto;
-    margin-right: auto;
-    text-align: center;
-}
-
-@media screen and (max-width: 550px) {
-    #divConsole {
-        width: 100%;
-    }
-}
-
-#divConsole {
-    margin-bottom: calc(var(--panel-margin)/2);
+#divPageBody {
+    max-width: calc(4.5*150pt);
+    margin-top: 10pt;
 }
 
 body {
@@ -303,49 +346,6 @@ body {
         margin: 0;
         background-color: antiquewhite;
     }
-}
-
-h1 {
-    margin-bottom: 0;
-    padding-top: 15pt;
-    text-align: center;
-    color: #8b0b75;
-    font-family: Special;
-    font-size: 18pt;
-
-}
-
-.subsectionColumn {
-    display: inline-flex;
-    flex-wrap: wrap;
-    margin-right: 30pt;
-}
-
-.subsectionColumn:last-child {
-    margin-right: 0pt;
-    flex-direction: column;
-}
-
-.subsectionBody {
-    display: inline-flexbox;
-}
-
-div.subsection {
-    padding-left: 20pt;
-    padding-right: 20pt;
-    padding-bottom: 20pt;
-    border-radius: 5pt;
-}
-
-.section {
-    display: block;
-}
-
-#divPageBody {
-    max-width: calc(4.5*150pt);
-    margin-left: auto;
-    margin-top: 10pt;
-    margin-right: auto;
 }
 
 /*

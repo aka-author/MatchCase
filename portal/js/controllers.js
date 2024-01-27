@@ -9,8 +9,6 @@ function validatePositiveInt(id) {
     let input = document.getElementById(id);
     let valid = input.value.match(/^[1-9]\d*$/);
     input.style.background = valid ? "#ffffff" : "#faa0a0";
-    if(GLOBAL_CONTROL_PANEL.isTerminated())
-        enableSimulation(valid);
 }
 
 
@@ -19,6 +17,12 @@ function validateNonNegativeInt(id) {
     input.style.background = input.value.match(/^\d+$/) ? "#ffffff" : "#faa0a0";
 }
 
+
+function validateNonNegativeReal(id) {
+    let input = document.getElementById(id);
+    let valid = input.value.match(/^\d*\.?\d+$/);
+    input.style.background = valid ? "#ffffff" : "#faa0a0";
+}
 
 function assembleOption(value, label, isSelected=false) {
 
@@ -92,7 +96,7 @@ function assemblePercentage11Select(id, selectedValue=undefined) {
 
 
 function selectTab(tabName) {
-    let shortcuts = ["Basics", "Cases"];
+    let shortcuts = ["Intro", "Basics", "Cases"];
     let tab = document.getElementById("divTab" + tabName);
     tab.style.display = "";
     let shortcut = document.getElementById("spanTabShortcut" + tabName);
