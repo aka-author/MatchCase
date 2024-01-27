@@ -35,10 +35,13 @@
             src="js/page.js"></script>
 
         <script>
+            
             var GLOBAL_PAGE_CONTROLLER = null;
             function initPage() {
                 GLOBAL_PAGE_CONTROLLER = new PageController();
             }
+
+            
         </script>
     </head>
     <body 
@@ -252,6 +255,7 @@
 
                     <div 
                         id="divSimilarCases"
+                        style="position: relative"
                         class="cpFormFieldBlock">
                         
                         <div
@@ -361,5 +365,7 @@
                 
         </div>    
         
+        <img id="imgProgress" src="img/lemon01-02.png" style="display: none">
+
     </body>
 </html>

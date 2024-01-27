@@ -301,7 +301,9 @@ class MatchCaseController {
         
         if(!!updateData.similarCases)
             this.getCaseReport().updateSimilarCasesTable(updateData.similarCases);
-        
+
+        stopProgressIndicator("divSimilarCases");
+
         return this;
     }
 

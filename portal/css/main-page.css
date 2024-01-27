@@ -26,6 +26,11 @@
 	src: url('FontsFree-Net-Biome-W04-Bold.ttf') format('truetype');
  }
 
+ img.progressIndicator {
+    position: absolute;
+    width: 50pt;
+ }
+
  #imgLogo {
     height: 40pt;
     margin-left: 15pt;

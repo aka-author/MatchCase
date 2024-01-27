@@ -66,8 +66,11 @@ class PageController {
 
     matchCase() {
 
+        
+
         this.getMatchCaseController().matchCase();
         selectTab("Cases");
+        runProgressIndicator("divSimilarCases");
 
         return this;
     }

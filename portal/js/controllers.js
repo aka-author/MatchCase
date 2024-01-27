@@ -1,6 +1,81 @@
 
 
+function centerX(parent, child) {
+    child.style.left = (parent.clientWidth - child.clientWidth)/2 + "px";
+}
+
+function centerY(parent, child) {
+    child.style.top = (parent.clientHeight - child.clientHeight)/2 + "px";
+}
+
+
+function cycleRotate(imageId, stopCallback) {
+    const img = document.getElementById(imageId);
+  
+    if (!img) {
+      console.error(`Element with ID '${imageId}' not found.`);
+      return;
+    }
+
+    let rotation = 0;
+  
+    const rotateInterval = setInterval(() => {
+      rotation += 10; 
+      img.style.transform = `rotate(${rotation}deg)`;
+      if (stopCallback()) {
+        clearInterval(rotateInterval);
+      }
+    }, 100); 
+}
+  
+function createProgressIndicator(progressIndicatorId) {
+
+    const img = document.createElement("img");
+    
+    img.setAttribute("id", progressIndicatorId);
+    img.setAttribute("src", "img/lemon01-02.png");
+    img.setAttribute("style", "display: block");
+    img.classList.add("progressIndicator");
+    
+    return img;
+}
+
+function assembleProgressIndicatorId(baseId) {
+    return baseId + "progress";
+}
+
+function runProgressIndicator(progrElementId) {
+
+    const progressIndicatorId = assembleProgressIndicatorId(progrElementId);
+
+    const imgProgressIndicator = createProgressIndicator(progressIndicatorId);
+
+    const progrElement = document.getElementById(progrElementId);
+    progrElement.appendChild(imgProgressIndicator);
+
+    centerX(progrElement, imgProgressIndicator);
+    centerY(progrElement, imgProgressIndicator);
+
+    cycleRotate(progressIndicatorId, () => false);
+   
+}
+
+function stopProgressIndicator(progrElementId) {
+
+    const progressIndicatorId = assembleProgressIndicatorId(progrElementId);
+    const imgProgressIndicator = document.getElementById(progressIndicatorId);
+
+    if(!!imgProgressIndicator)
+        imgProgressIndicator.remove();
+
+    /* const imgProgressIndicator = document.getElementById("imgProgress");
+    imgProgressIndicator.style.display = "none";
+    GLOBAL_PROGRESS_INDICATOR = false; */
+}
+
+
 function enableSimulation(flag) {
+    
     document.getElementById("buttonSimulate").disabled = !flag;
 
 }

@@ -59,7 +59,9 @@ class MatchCaseSimilarCasesReporter {
             response => {
                 if(response.ok) 
                     response.json().then(
-                        report => this.updatePage(report["evaluation"])
+                        report => {
+                            this.updatePage(report["evaluation"]); 
+                        }
                     )
                 else 
                     this.handleError({
