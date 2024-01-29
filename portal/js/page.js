@@ -12,6 +12,7 @@ class PageController {
         this.cfg = this.loadCfg();
         
         this.matchCaseController = this.createMatchCaseController(this);
+
         this.controlPanel = new ControlPanel(this);
         GLOBAL_CONTROL_PANEL = this.controlPanel;
     }
@@ -30,6 +31,9 @@ class PageController {
     }
 
     createMatchCaseController() {
+
+        runProgressIndicator("divTabBasics", 120, 50);
+
         return new MatchCaseController(this);
     }
 
@@ -37,27 +41,49 @@ class PageController {
         return this.matchCaseController;
     }
 
+    validateBusinessForm() {
+        const inputCompareButton = document.getElementById("inputCompareButton");
+        inputCompareButton.disabled = !this.matchCaseController.validate();
+    }
+
     updateSpecializationSelect() {
 
         this.matchCaseController.updateSpecializationSelect();
 
         const industryCode = this.matchCaseController.caseForm.getIndustryCode();
+
         const divIndustryTellUsMore = document.getElementById("divIndustryTellUsMore");
         const divSpecializationTellUsMore = document.getElementById("divSpecializationTellUsMore");
 
-        if(industryCode === "Misc.") {
+        const selectSpecialization = document.getElementById("selectSpecialization");
+        
+        if(industryCode == "null") {
+            selectSpecialization.disabled = true;
+            divSpecializationTellUsMore.style.display = "none";
+        } else if(industryCode === "Misc.") {
             divIndustryTellUsMore.style.display = "";
             divSpecializationTellUsMore.style.display = "";
+            selectSpecialization.disabled = true;
         } else {
             divIndustryTellUsMore.style.display = "none";
             divSpecializationTellUsMore.style.display = "none";
+            selectSpecialization.disabled = false;
         }
     }
 
     checkSpecialization() {
+
+        const industryCode = this.matchCaseController.caseForm.getIndustryCode();
         const specializationCode = this.matchCaseController.caseForm.getSpecializationCode();
+        
         const divTellUsMore = document.getElementById("divSpecializationTellUsMore");
-        divTellUsMore.style.display = specializationCode.includes("Misc") ? "" : "none";
+        
+        if(industryCode === "null") {
+            divTellUsMore.style.display = "none";
+        }
+        
+        divTellUsMore.style.display = 
+        specializationCode === "null" || specializationCode.includes("Misc") ? "" : "none";
     }
 
     startComparing() {
@@ -66,10 +92,10 @@ class PageController {
 
     matchCase() {
 
-        
-
         this.getMatchCaseController().matchCase();
+
         selectTab("Cases");
+
         runProgressIndicator("divSimilarCases");
 
         return this;

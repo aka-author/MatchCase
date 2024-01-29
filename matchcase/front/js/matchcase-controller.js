@@ -18,7 +18,9 @@ class MatchCaseForm {
         this.selectCountry = this.getSelectCountryDomObject();
         this.selectYearFounded = this.getSelectYearFoundedDomObject();
         this.selectIndustry = this.getSelectIndustryDomObject();
+        this.inputIndustry = this.getInputIndustryDomObject();
         this.selectSpecialization = this.getSelectSpecializationDomObject();
+        this.inputSpecialization = this.getInputSpecializationDomObject();
         this.inputNumberOfEployees = this.getInputNumberOfEmployeesDomObject();
         this.inputRevenue = this.getInputRevenueDomObject();
         
@@ -49,6 +51,14 @@ class MatchCaseForm {
         return this.selectIndustry.value;
     }
 
+    getIndustryDesc() {
+        return this.inputIndustry.value;
+    }
+
+    getInputIndustryDomObject() {
+        return document.getElementById("inputIndustry");
+    }
+
     getSelectSpecializationDomObject() {
         return document.getElementById("selectSpecialization");
     }
@@ -57,6 +67,14 @@ class MatchCaseForm {
         return this.selectSpecialization.value;
     }
     
+    getInputSpecializationDomObject() {
+        return document.getElementById("inputSpecialization");
+    }
+
+    getSpecializationDesc() {
+        return this.inputSpecialization.value;
+    }
+
     getYearFounded() {
         return parseInt(this.selectYearFounded.value);
     }
@@ -137,10 +155,12 @@ class MatchCaseForm {
     getCaseParams() {
 
         let caseParams = {
-            "industry_code": this.getIndustryCode(),
             "country_code": this.getCountryCode(),
             "founded_in": this.getYearFounded(),
+            "industry_code": this.getIndustryCode(),
+            "industry_desc": this.getIndustryDesc(),
             "specialization_code": this.getSpecializationCode(),
+            "specialization_desc": this.getSpecializationDesc(),
             "num_employees": this.getNumberOfEmployees(),
             "revenue": this.getRevenue()
         };
@@ -303,8 +323,51 @@ class MatchCaseController {
             this.getCaseReport().updateSimilarCasesTable(updateData.similarCases);
 
         stopProgressIndicator("divSimilarCases");
+        stopProgressIndicator("divTabBasics");
 
         return this;
+    }
+
+    validateIndustry(caseParams) {
+
+        if(caseParams.industry_code === "null") return false;
+
+        if(caseParams.industry_code === "Misc." 
+           && caseParams.industry_desc.length <= 1) return false;
+
+        return true;
+    }
+
+    validateSpecialization(caseParams) {
+
+        if(caseParams.industry_code !== "Misc."
+           && caseParams.specialization_code === "null") return false;
+
+        if(caseParams.industry_code === "Misc." 
+           && caseParams.specialization_desc.length <= 1) return false;
+
+        if(caseParams.specialization_code.includes("Misc")
+           && caseParams.specialization_desc.length <= 1) return false;
+        
+        if(caseParams.industry_code === "null") return false;
+
+        return true;
+    }
+
+    validate() {
+
+        const caseParams = this.getCaseForm().getCaseParams();
+
+        const valid = caseParams.country_code != "null" 
+                      && !isNaN(caseParams.founded_in) 
+                      && this.validateIndustry(caseParams)
+                      && this.validateSpecialization(caseParams)
+                      && !isNaN(caseParams.num_employees) 
+                      && !isNaN(caseParams.revenue)
+                      && validateNonNegativeInt("inputNumberOfEmployees")
+                      && validateNonNegativeReal('inputRevenue')
+
+        return valid;
     }
 
     matchCase() {

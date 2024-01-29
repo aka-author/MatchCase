@@ -121,130 +121,144 @@
                 <div 
                     id="divTabBasics"
                     class="cpTab"
-                    style="display: none">
+                    style="display: none; position: relative"
+                    onchange="GLOBAL_PAGE_CONTROLLER.validateBusinessForm()"
+                    oninput="GLOBAL_PAGE_CONTROLLER.validateBusinessForm()">
                 
-                    <div 
-                        class="cpFormFieldBlock">
-                        
-                        <div
-                            class="cpFormFieldBlockHeader">
-                            <h2>General</h2>
-                        </div>
-                        
+                    <form id="formCase" autocomplete="off">
+
                         <div 
-                            id="divMatchFormBody"
-                            class="cpFormFieldBlockBody">
-                            <div class="cpFormField">
-                                <label>Country</label>
-                                <span>
-                                    <select 
-                                        id="selectCountry"></select>
-                                </span>
-                            </div>
-                            <div class="cpFormField">
-                                <label>Founded</label>
-                                <span>
-                                    <select
-                                        id="selectYearFounded"></select>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                
-                    <div 
-                        class="cpFormFieldBlock">
-                        
-                        <div
-                            class="cpFormFieldBlockHeader">
-                            <h2>Profile</h2>
-                        </div>
-                        
-                        <div 
-                            id="divMatchFormBody"
-                            class="cpFormFieldBlockBody">
-                            <div 
-                                class="cpFormField">
-                                <label>Industry</label>
-                                <span>
-                                    <select 
-                                        id="selectIndustry"
-                                        onchange="GLOBAL_PAGE_CONTROLLER.updateSpecializationSelect()"></select>
-                                </span>
-                            </div>
+                            class="cpFormFieldBlock">
+                            
                             <div
-                                id="divIndustryTellUsMore" 
-                                class="cpFormField" 
-                                style="display: none">
-                                <label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tell us more, please</label>
-                                <span>
-                                    <input 
-                                        id="inputIndustry">
-                                </span>
-                            </div>
-                            <div 
-                                class="cpFormField">
-                                <label>Specialization</label>
-                                <span>
-                                    <select 
-                                        id="selectSpecialization"
-                                        onchange="GLOBAL_PAGE_CONTROLLER.checkSpecialization()"></select>
-                                </span>
-                            </div>
-                            <div
-                                id="divSpecializationTellUsMore" 
-                                class="cpFormField" 
-                                style="display: none">
-                                <label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tell us more, please</label>
-                                <span>
-                                    <input 
-                                        id="inputSpecialization">
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                
-                    <div 
-                        class="cpFormFieldBlock">
-                        
-                        <div
-                            class="cpFormFieldBlockHeader">
-                            <h2>Metrics</h2>
-                        </div>
-                        
-                        <div 
-                            id="divMatchFormBody"
-                            class="cpFormFieldBlockBody">
-                            <div class="cpFormField">
-                                <label>Number of employees</label>
-                                <span>
-                                    <input 
-                                        id="inputNumberOfEmployees" 
-                                        size="4em"
-                                        oninput="validatePositiveInt('inputNumberOfEmployees')">
-                                </span>
-                            </div>
-                            <div class="cpFormField">
-                                <label>Revenue, $M</label>
-                                <span>
-                                    <input 
-                                        id="inputRevenue" 
-                                        size="4em"
-                                        oninput="validateNonNegativeReal('inputRevenue')">
-                                </span>
+                                class="cpFormFieldBlockHeader">
+                                <h2>General</h2>
                             </div>
                             
-                        </div>
-                    </div>
+                            <div 
+                                id="divMatchFormBody"
+                                class="cpFormFieldBlockBody">
 
-                    <div 
-                        class="cpButtonBlock">
-                        <span>
-                            <input 
-                                type="button" 
-                                value="Compare!" 
-                                onclick="GLOBAL_PAGE_CONTROLLER.matchCase()">
-                        </span>
-                    </div>
+                                <div class="cpFormField">
+                                    <label>Country*</label>
+                                    <span>
+                                        <select 
+                                            id="selectCountry"></select>
+                                    </span>
+                                </div>
+                                <div class="cpFormField">
+                                    <label>Founded*</label>
+                                    <span>
+                                        <select
+                                            id="selectYearFounded"></select>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div 
+                            class="cpFormFieldBlock">
+                            
+                            <div
+                                class="cpFormFieldBlockHeader">
+                                <h2>Profile</h2>
+                            </div>
+                            
+                            <div 
+                                id="divMatchFormBody"
+                                class="cpFormFieldBlockBody">
+                                <div 
+                                    class="cpFormField">
+                                    <label>Industry*</label>
+                                    <span>
+                                        <select 
+                                            id="selectIndustry"
+                                            onchange="GLOBAL_PAGE_CONTROLLER.updateSpecializationSelect()"></select>
+                                    </span>
+                                </div>
+                                <div
+                                    id="divIndustryTellUsMore" 
+                                    class="cpFormField" 
+                                    style="display: none">
+                                    <label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tell us more, please</label>
+                                    <span>
+                                        <input 
+                                            id="inputIndustry">
+                                    </span>
+                                </div>
+                                <div 
+                                    class="cpFormField">
+                                    <label>Specialization*</label>
+                                    <span>
+                                        <select 
+                                            id="selectSpecialization"
+                                            disabled
+                                            onchange="GLOBAL_PAGE_CONTROLLER.checkSpecialization()"></select>
+                                    </span>
+                                </div>
+                                <div
+                                    id="divSpecializationTellUsMore" 
+                                    class="cpFormField" 
+                                    style="display: none">
+                                    <label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tell us more, please*</label>
+                                    <span>
+                                        <input 
+                                            id="inputSpecialization"
+                                            oninput="GLOBAL_PAGE_CONTROLLER.checkSpecialization()"
+                                            onchange="GLOBAL_PAGE_CONTROLLER.checkSpecialization()">
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div 
+                            class="cpFormFieldBlock">
+                            
+                            <div
+                                class="cpFormFieldBlockHeader">
+                                <h2>Metrics</h2>
+                            </div>
+                            
+                            <div 
+                                id="divMatchFormBody"
+                                class="cpFormFieldBlockBody">
+                                <div class="cpFormField">
+                                    <label>Number of employees*</label>
+                                    <span>
+                                        <input 
+                                            id="inputNumberOfEmployees" 
+                                            size="4em"
+                                            oninput="validatePositiveInt('inputNumberOfEmployees')"
+                                            onchange="validatePositiveInt('inputNumberOfEmployees')">
+                                    </span>
+                                </div>
+                                <div class="cpFormField">
+                                    <label>Revenue*, $M</label>
+                                    <span>
+                                        <input 
+                                            id="inputRevenue" 
+                                            size="4em"
+                                            oninput="validateNonNegativeReal('inputRevenue')"
+                                            onchange="validateNonNegativeReal('inputRevenue')">
+                                    </span>
+                                </div>
+                                
+                            </div>
+                        </div>
+
+                        <div 
+                            class="cpButtonBlock">
+                            <span>
+                                <input 
+                                    id="inputCompareButton"
+                                    type="button" 
+                                    value="Compare!" 
+                                    disabled
+                                    onclick="GLOBAL_PAGE_CONTROLLER.matchCase()">
+                            </span>
+                        </div>
+
+                    </form>
 
                 </div>
 

@@ -1,11 +1,11 @@
 
 
-function centerX(parent, child) {
-    child.style.left = (parent.clientWidth - child.clientWidth)/2 + "px";
+function centerX(parent, child, x=undefined) {
+    child.style.left = (!!x ? x : (parent.clientWidth - child.clientWidth)/2) + "px";
 }
 
-function centerY(parent, child) {
-    child.style.top = (parent.clientHeight - child.clientHeight)/2 + "px";
+function centerY(parent, child, y=undefined) {
+    child.style.top = (!!y ? y : (parent.clientHeight - child.clientHeight)/2) + "px";
 }
 
 
@@ -44,7 +44,7 @@ function assembleProgressIndicatorId(baseId) {
     return baseId + "progress";
 }
 
-function runProgressIndicator(progrElementId) {
+function runProgressIndicator(progrElementId, x=undefined, y=undefined) {
 
     const progressIndicatorId = assembleProgressIndicatorId(progrElementId);
 
@@ -53,8 +53,8 @@ function runProgressIndicator(progrElementId) {
     const progrElement = document.getElementById(progrElementId);
     progrElement.appendChild(imgProgressIndicator);
 
-    centerX(progrElement, imgProgressIndicator);
-    centerY(progrElement, imgProgressIndicator);
+    centerX(progrElement, imgProgressIndicator, x);
+    centerY(progrElement, imgProgressIndicator, y);
 
     cycleRotate(progressIndicatorId, () => false);
    
@@ -67,10 +67,6 @@ function stopProgressIndicator(progrElementId) {
 
     if(!!imgProgressIndicator)
         imgProgressIndicator.remove();
-
-    /* const imgProgressIndicator = document.getElementById("imgProgress");
-    imgProgressIndicator.style.display = "none";
-    GLOBAL_PROGRESS_INDICATOR = false; */
 }
 
 
@@ -89,7 +85,9 @@ function validatePositiveInt(id) {
 
 function validateNonNegativeInt(id) {
     let input = document.getElementById(id);
-    input.style.background = input.value.match(/^\d+$/) ? "#ffffff" : "#faa0a0";
+    valid = input.value.match(/^\d+$/);
+    input.style.background = valid ? "#ffffff" : "#faa0a0";
+    return valid;
 }
 
 
@@ -97,6 +95,7 @@ function validateNonNegativeReal(id) {
     let input = document.getElementById(id);
     let valid = input.value.match(/^\d*\.?\d+$/);
     input.style.background = valid ? "#ffffff" : "#faa0a0";
+    return valid;
 }
 
 function assembleOption(value, label, isSelected=false) {

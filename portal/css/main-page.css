@@ -28,7 +28,7 @@
 
  img.progressIndicator {
     position: absolute;
-    width: 50pt;
+    width: 70pt;
  }
 
  #imgLogo {
@@ -145,8 +145,7 @@ label {
 
 @media screen and (max-width: 550px) {
     label {
-        min-width: calc(var(--panel-width)*0.2);
-        max-width: calc(var(--panel-width)*0.6);
+        width: 100%;
     }
 }
 
@@ -165,7 +164,7 @@ span.input {
 
 @media screen and (max-width: 550px) {
     span.input {
-        width: 0px;
+        width: auto;
     }
 }
 
@@ -266,6 +265,12 @@ div.cpFormFieldBlockBody {
 
 div.cpFormFieldBlock {
     margin-top: var(--cp-form-field-block-margin-top);
+}
+
+@media screen and (max-width: 550px) {
+    div.cpFormFieldBlock {
+        width: 100%;
+    }
 }
 
 input[type="button"] {
