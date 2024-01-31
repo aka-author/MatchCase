@@ -42,8 +42,12 @@ class DistGraph extends Worker {
             "case_sat": 100,
             "instance_hue": 115,
             "instance_sat": 100,
+            "dot_width": 6,
+            "dot_height": 6,
             "grid_cells_x": 4,
             "grid_cells_y": 4,
+            "x_decimals": 0,
+            "y_decimals": 0,
             "record_class_name": "distGraphRecord",
             "grid_class_name": "distGraphGrid", 
             "canvas_class_name": "distGraphCanvas",
@@ -81,6 +85,14 @@ class DistGraph extends Worker {
         return this.options["instance_sat"];
     }
 
+    getDotWidth() {
+        return this.options["dot_width"];
+    }
+
+    getDotHeight() {
+        return this.options["dot_height"];
+    }
+
     getGridCellsX() {
         return this.options["grid_cells_x"];
     }
@@ -91,6 +103,14 @@ class DistGraph extends Worker {
 
     getCanvasXYExtensionKoeff() {
         return this.options["canvas_xy_extension_koeff"];
+    }
+
+    getXDecimals() {
+        return this.options["x_decimals"];
+    }
+
+    getYDecimals() {
+        return this.options["y_decimals"];
     }
 
     getRecordClassName() {
@@ -313,12 +333,15 @@ class DistGraph extends Worker {
 
     assembleRecordDomObject(caseRecord, hslColor) {
 
-        let divCase = document.createElement("div");
+        const divCase = document.createElement("div");
 
-        let left = 100*this.getCanvasX(this.getX(caseRecord));
-        let top  = 100*this.getCanvasY(this.getY(caseRecord));
+        const left = 100*this.getCanvasX(this.getX(caseRecord));
+        const leftExpr = `calc(${left}% - ${this.getDotWidth()/2}px)`;
 
-        divCase.setAttribute("style", `left: ${left}%; top: ${top}%; background: ${hslColor}`);
+        const top  = 100*this.getCanvasY(this.getY(caseRecord));
+        const topExpr = `calc(${top}% - ${this.getDotHeight()/2}px)`;
+        
+        divCase.setAttribute("style", `left: ${leftExpr}; top: ${topExpr}; background: ${hslColor}`);
         
         divCase.classList.add(this.getRecordClassName());
 
@@ -344,11 +367,14 @@ class DistGraph extends Worker {
         const xLabels = [];
 
         const span = 100/this.getGridCellsX();
+        const xSpan = this.getCanvasXSpan()/this.getGridCellsX(); 
+        let promo = this.getCanvasMinX();
 
         for(let i = 0; i < this.getGridCellsX(); i++) {
             let divLabel = document.createElement("div");
             divLabel.setAttribute("style", `left: ${i*span}%`);
-            divLabel.textContent = i.toString();
+            divLabel.textContent = promo.toFixed(this.getXDecimals());
+            promo += xSpan;
             divLabel.classList.add("distGraphXLabel");
             xLabels.push(divLabel);
         }
@@ -360,12 +386,16 @@ class DistGraph extends Worker {
 
         const yLabels = [];
 
-        const span = 100/this.getGridCellsX();
+        const span = 100/this.getGridCellsY();
+        let ySpan = this.getCanvasYSpan()/this.getGridCellsY();
+        let promo = this.getCanvasMinY();
 
-        for(let i = this.getGridCellsY(); i > 0 ; i--) {
+        for(let i = 1; i <= this.getGridCellsY(); i++) {
             let divLabel = document.createElement("div");
-            divLabel.setAttribute("style", `top : ${(i - 1)*span}%`);
-            divLabel.textContent = (this.getGridCellsY() - i + 1).toString();
+            divLabel.setAttribute("style", `top : ${(this.getGridCellsY() - i)*span}%`);
+            promo += ySpan;
+            divLabel.textContent = promo.toFixed(this.getYDecimals());
+            
             divLabel.classList.add("distGraphYLabel");
             yLabels.push(divLabel);
         }
@@ -442,13 +472,22 @@ console.log("!!!");
 
 const graph = new DistGraph(null, "divTestGraph");
 
+graph.setOptions(
+    {
+        "grid_cells_x": 5,
+        "grid_cells_y": 5,
+        "x_decimals": 2,
+        "y_decimals": 1
+    }
+)
+
 graph.setDataSet(
     [
-        {"x": 1, "y":  2, "dist": 100},
-        {"x": 2, "y":  5, "dist": 10},
-        {"x": 3, "y":  7, "dist": 25},
-        {"x": 4, "y":  9, "dist": 46},
-        {"x": 5, "y": 11, "dist": 30}
+        {"x": 1.7, "y":  2, "dist": 100},
+        {"x": 2.4, "y":  5, "dist": 10},
+        {"x": 3.2, "y":  7, "dist": 25},
+        {"x": 4.5, "y":  9, "dist": 46},
+        {"x": 5,   "y": 11, "dist": 30}
     ]
 );
 
