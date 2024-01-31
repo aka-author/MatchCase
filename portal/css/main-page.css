@@ -364,7 +364,7 @@ body {
     --height: 200px;
 }
 
-.distGraphRecord {
+div.distGraphRecord {
     position: absolute;
     left: 10px;
     top: 20px;
@@ -372,6 +372,15 @@ body {
     height: 6px;
     border-radius: 3px;
     background: #8b0b75;
+}
+
+div.distGraphHint {
+    position: absolute;
+    padding: 5pt;
+    border: 1px dotted #dddd1c;
+    border-radius: 3pt;
+    background: #f5f5b2;
+    font-size: 8pt;
 }
 
 table.distGraphGrid td {

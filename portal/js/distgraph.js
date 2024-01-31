@@ -19,6 +19,8 @@ class DistGraph extends Worker {
 
         this.options = {};
         this.setDefaultOptions();
+
+        this.activeHint = null;
     }
 
     // Options
@@ -36,8 +38,10 @@ class DistGraph extends Worker {
         const defaultOptions = {
             "x_col_name": "x",
             "y_col_name": "y",
-            "canvas_xy_extension_koeff": 0.1,
+            "name_col_name": "name",
+            "link_col_name": "url",
             "dist_col_name": "dist",
+            "canvas_xy_extension_koeff": 0.1,
             "case_hue": 285,
             "case_sat": 100,
             "instance_hue": 115,
@@ -49,9 +53,11 @@ class DistGraph extends Worker {
             "x_decimals": 0,
             "y_decimals": 0,
             "record_class_name": "distGraphRecord",
+            "hint_class_name": "distGraphHint",
             "grid_class_name": "distGraphGrid", 
             "canvas_class_name": "distGraphCanvas",
-            "frame_class_name": "distGraphFrame"
+            "frame_class_name": "distGraphFrame",
+            "instance_hint_wording": "You are here"
         }
 
         this.setOptions(defaultOptions);
@@ -63,6 +69,14 @@ class DistGraph extends Worker {
 
     getYColName() {
         return this.options["y_col_name"];
+    }
+
+    getNameColName() {
+        return this.options["name_col_name"];
+    }
+
+    getLinkColName() {
+        return this.options["link_col_name"];
     }
 
     getDistColName() {
@@ -117,6 +131,10 @@ class DistGraph extends Worker {
         return this.options["record_class_name"];
     }
 
+    getHintClassName() {
+        return this.options["hint_class_name"];
+    }
+
     getGridClassName() {
         return this.options["grid_class_name"];
     }
@@ -129,6 +147,10 @@ class DistGraph extends Worker {
         return this.options["frame_class_name"];
     }
 
+    getInstanceHintWording() {
+        return this.options["instance_hint_wording"]
+    }
+
     // Case records
 
     getX(caseRecord) {
@@ -137,6 +159,14 @@ class DistGraph extends Worker {
 
     getY(caseRecord) {
         return caseRecord[this.getYColName()];
+    }
+
+    getName(caseRecord) {
+        return caseRecord[this.getNameColName()];
+    }
+
+    getLink(caseRecord) {
+        return caseRecord[this.getLinkColName()];
     }
 
     getDist(caseRecord) {
@@ -331,9 +361,57 @@ class DistGraph extends Worker {
         return this.assembleHslColor(hue, sat, lum);
     }
 
-    assembleRecordDomObject(caseRecord, hslColor) {
+    assembleCaseHintContent(caseRecord) {
+
+        const divName = document.createElement("div");
+
+        const aName = document.createElement("a");
+        aName.setAttribute("href", this.getLink(caseRecord));
+        aName.setAttribute("target", "_new");
+        aName.textContent = this.getName(caseRecord);
+        divName.appendChild(aName);
+
+        return divName;
+    }
+
+    assembleInstanceHintContent(caseRecord) {
+
+        const divName = document.createElement("div");    
+        divName.textContent = this.getInstanceHintWording();
+
+        return divName;
+    }
+
+    getActiveHint() {
+        return this.activeHint; 
+    }
+
+    hideActiveHint() {
+
+        const hint = this.getActiveHint();
+
+        if(!!hint)
+            hint.style.display = "none";
+
+        return this;
+    }
+
+    assembleHintDomObject(caseRecord, baseId, domContent) {
+
+        const divHint = document.createElement("div");
+        divHint.setAttribute("id", baseId + "hint");
+        divHint.setAttribute("style", "display: none");
+        divHint.classList.add(this.getHintClassName());
+
+        divHint.appendChild(domContent);
+
+        return divHint;
+    }
+
+    assembleRecordDomObject(caseRecord, hslColor, id) {
 
         const divCase = document.createElement("div");
+        divCase.setAttribute("id", id + "dot");
 
         const left = 100*this.getCanvasX(this.getX(caseRecord));
         const leftExpr = `calc(${left}% - ${this.getDotWidth()/2}px)`;
@@ -345,21 +423,39 @@ class DistGraph extends Worker {
         
         divCase.classList.add(this.getRecordClassName());
 
+        if(!!id) {
+            const me = this;
+
+            divCase.addEventListener("mouseover", function(e) {
+
+                const caseDot = document.getElementById(id + "dot");
+
+                me.hideActiveHint();
+
+                const hint = document.getElementById(id + "hint");
+                hint.style.display = "";
+                hint.style.left = (caseDot.offsetLeft - hint.clientWidth) + "px";
+                hint.style.top = (caseDot.offsetTop - hint.clientHeight) + "px";
+
+                me.activeHint = hint;
+            });
+        }
+
         return divCase;
     }
 
-    assembleCaseDomObject(caseRecord) {
+    assembleCaseDomObject(caseRecord, id) {
 
         const hslColor = this.assembleCaseColor(caseRecord);
 
-        return this.assembleRecordDomObject(caseRecord, hslColor);
+        return this.assembleRecordDomObject(caseRecord, hslColor, id);
     }
 
-    assembleInstanceDomObject(instanceRecord) {
+    assembleInstanceDomObject(instanceRecord, id) {
 
         const hslColor = this.assembleInstanceColor(instanceRecord);
 
-        return this.assembleRecordDomObject(instanceRecord, hslColor);
+        return this.assembleRecordDomObject(instanceRecord, hslColor, id);
     }
 
     assembleXLabels() {
@@ -436,6 +532,12 @@ class DistGraph extends Worker {
         for(const yLabel of yLabels)
             divCanvas.appendChild(yLabel);
 
+        const me = this;
+        divCanvas.addEventListener("click", function(e) {
+            if(e.target.tagName !== "A")
+                me.hideActiveHint();
+        });
+
         return divCanvas;
     }
 
@@ -456,13 +558,26 @@ class DistGraph extends Worker {
         this.divFrame = this.assembleFrameDomObject();
 
         for(const caseRecord of this.dataSet) {
-            let divCase = this.assembleCaseDomObject(caseRecord);
+
+            let id = createDomId();
+
+            let divCase = this.assembleCaseDomObject(caseRecord, id);
             this.divCanvas.appendChild(divCase);
+            
+            let domHintContent = this.assembleCaseHintContent(caseRecord);
+            let divHint = this.assembleHintDomObject(caseRecord, id, domHintContent);
+            this.divCanvas.appendChild(divHint);
         }
 
-        const divInstance = this.assembleInstanceDomObject(this.instance);
+        let id = createDomId();
+
+        let divInstance = this.assembleInstanceDomObject(this.instance, id);
         this.divCanvas.appendChild(divInstance);
 
+        let domHintContent = this.assembleInstanceHintContent(this.instance);
+        let divHint = this.assembleHintDomObject(this.instance, id, domHintContent);
+        this.divCanvas.appendChild(divHint);
+        
         return this.divFrame;
     }
 
@@ -483,11 +598,11 @@ graph.setOptions(
 
 graph.setDataSet(
     [
-        {"x": 1.7, "y":  2, "dist": 100},
-        {"x": 2.4, "y":  5, "dist": 10},
-        {"x": 3.2, "y":  7, "dist": 25},
-        {"x": 4.5, "y":  9, "dist": 46},
-        {"x": 5,   "y": 11, "dist": 30}
+        {"name": "Microsoft", "url": "http://www.microsoft.com", "x": 1.7, "y":  2, "dist": 100},
+        {"name": "Oracle", "url": "http://www.oracle.com", "x": 2.4, "y":  5, "dist": 10},
+        {"name": "SAP", "url": "http://www.sap.com", "x": 3.2, "y":  7, "dist": 25},
+        {"name": "IBM", "url": "http://www.ibm.com", "x": 4.5, "y":  9, "dist": 46},
+        {"name": "HP", "url": "http://www.hp.com", "x": 5,   "y": 11, "dist": 30}
     ]
 );
 

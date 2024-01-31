@@ -8,6 +8,9 @@ function createUuid() {
     return uuid;
 }
 
+function createDomId() {
+    return "i" + Math.random();
+}
 
 class Worker {
         
