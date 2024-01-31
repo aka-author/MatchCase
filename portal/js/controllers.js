@@ -170,7 +170,7 @@ function assemblePercentage11Select(id, selectedValue=undefined) {
 
 
 function selectTab(tabName) {
-    let shortcuts = ["Intro", "Basics", "Cases"];
+    let shortcuts = ["Intro", "Basics", "Cases", "Graphs"];
     let tab = document.getElementById("divTab" + tabName);
     tab.style.display = "";
     let shortcut = document.getElementById("spanTabShortcut" + tabName);

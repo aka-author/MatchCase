@@ -3,9 +3,13 @@ function fallback(explicitValue, defaultValue) {
     return !!explicitValue ? explicitValue : defaultValue;
 }
 
-class DistGraph {
+class DistGraph extends Worker {
 
     constructor(chief, id) {
+
+        super(chief);
+
+        this.id = id;
 
         this.minX = undefined;
         this.maxX = undefined;
@@ -13,6 +17,7 @@ class DistGraph {
         this.maxY = undefined;
         this.maxDist = undefined;
 
+        this.options = {};
         this.setDefaultOptions();
     }
 
@@ -29,6 +34,8 @@ class DistGraph {
     setDefaultOptions() {
 
         const defaultOptions = {
+            "canvas_width": 500,
+            "canvas_height": 200,
             "x_col_name": "x",
             "y_col_name": "y",
             "dist_col_name": "dist",
@@ -43,6 +50,14 @@ class DistGraph {
         }
 
         this.setOptions(defaultOptions);
+    }
+
+    getCanvasWidth() {
+        return this.options["canvas_width"];
+    }
+
+    getCanvasHeight() {
+        return this.options["canvas_height"];
     }
 
     getXColName() {
@@ -96,11 +111,11 @@ class DistGraph {
     }
 
     getY(caseRecord) {
-        return caseRecord[this.getYColName];
+        return caseRecord[this.getYColName()];
     }
 
     getDist(caseRecord) {
-        return caseRecord[this.getDistColName];
+        return caseRecord[this.getDistColName()];
     }
 
     // Data set
@@ -110,19 +125,33 @@ class DistGraph {
     }
 
     getExtendedColValues(colName) {
-        return this.getColValues(colName).push(this.instance[colName]);
+        
+        const values = this.getColValues(colName);
+        
+        if(!!this.instance)
+            values.push(this.instance[colName]);
+
+        return values;
     }
 
     getMinCol(colName) {
-        return Math.min(this.getExtendedColValues(colName));
+        return Math.min(...this.getExtendedColValues(colName));
     }
 
     getMaxCol(colName) {
-        return Math.max(this.getExtendedColValues(colName));
+        return Math.max(...this.getExtendedColValues(colName));
+    }
+
+    detectMinX() {
+        return this.getMinCol(this.getXColName());
     }
 
     detectMaxX() {
         return this.getMaxCol(this.getXColName());
+    }
+
+    detectMinY() {
+        return this.getMinCol(this.getYColName());
     }
 
     detectMaxY() {
@@ -143,6 +172,26 @@ class DistGraph {
         this.maxDist = this.detectMaxDist();
 
         return this;
+    }
+
+    getMinX() {
+        return this.minX;
+    }
+
+    getMaxX() {
+        return this.maxX;
+    }
+
+    getMinY() {
+        return this.minY;
+    }
+
+    getMaxY() {
+        return this.maxY;
+    }
+
+    getMaxDist() {
+        return this.maxDist;
     }
 
     setDataSet(dataSet) {
@@ -176,10 +225,12 @@ class DistGraph {
     }
 
     getNormalX(caseRecord) {
+        
         return this.getX(caseRecord)/this.getXSpan();
     }
 
     getNormalY(caseRecord) {
+        console.log(this.getY(caseRecord), this.getYSpan());
         return this.getY(caseRecord)/this.getYSpan();
     }
 
@@ -201,7 +252,7 @@ class DistGraph {
 
         const hue = this.getCaseHue();
         const sat = this.getCaseSaturation();
-        const lum = this.calcLum(this.getNormaldDist(caseRecord));
+        const lum = this.calcLum(this.getNormalDist(caseRecord));
 
         return this.assembleHslColor(hue, sat, lum);
     }
@@ -210,7 +261,7 @@ class DistGraph {
 
         const hue = this.getInstanceHue();
         const sat = this.getInstanceSaturation();
-        const lum = this.calcLum(this.getNormaldDist(caseRecord));
+        const lum = this.calcLum(this.getNormalDist(caseRecord));
 
         return this.assembleHslColor(hue, sat, lum);
     }
@@ -219,9 +270,17 @@ class DistGraph {
 
         let divCase = document.createElement("div");
 
-        divCase.style.left = this.getNormalX(caseRecord) + "px";
-        divCase.style.top = this.getNormalY(caseRecord) + "px";
-        divCase.style.background = hslColor;
+        let left = (this.getNormalX(caseRecord)*this.getCanvasWidth()).toString() + "px";
+        let top = (this.getCanvasHeight() - this.getNormalY(caseRecord)*this.getCanvasHeight()).toString() + "px";
+
+        divCase.setAttribute("style", `left: ${left}; top: ${top}; background: ${hslColor}`);
+
+        //divCase.style.background = hslColor;
+        //divCase.style.left = this.getNormalX(caseRecord)*100 + "px";
+        //divCase.style.top = this.getNormalY(caseRecord)*100 + "px";
+
+        //console.log("::", divCase.style.top);
+        
         divCase.classList.add(this.getRecordClassName());
 
         return divCase;
@@ -241,7 +300,7 @@ class DistGraph {
         return this.assembleRecordDomObject(instanceRecord, hslColor);
     }
 
-    assembleGrid() {
+    assembleGridDomObject() {
 
         const tableGrid = document.createElement("table");
         tableGrid.classList.add(this.getTableGridClassName());
@@ -267,9 +326,13 @@ class DistGraph {
 
         const divCanvas = document.createElement("div");
         divCanvas.setAttribute("id", this.id);
+        divCanvas.setAttribute("style", `width ${this.getCanvasWidth()}px; height: ${this.getCanvasHeight()}px`)
+
+        const tableGrid = this.assembleGridDomObject();
+        divCanvas.appendChild(tableGrid);
 
         for(const caseRecord of this.dataSet) {
-            let divCase = this.assembleCaseDomObject(caseRecord)
+            let divCase = this.assembleCaseDomObject(caseRecord);
             divCanvas.appendChild(divCase);
         }
 
@@ -279,4 +342,28 @@ class DistGraph {
         return divCanvas;
     }
 
+    
+
 }
+
+console.log("!!!");
+
+const graph = new DistGraph(null, "divTestGraph");
+
+graph.setDataSet(
+    [
+        {"x": 1, "y":  2, "dist": 100},
+        {"x": 2, "y":  5, "dist": 10},
+        {"x": 3, "y":  7, "dist": 25},
+        {"x": 4, "y":  9, "dist": 46},
+        {"x": 5, "y": 11, "dist": 30}
+    ]
+);
+
+graph.setInstance({"x": 4.5, "y":  4, "dist": 0});
+
+console.log(graph);
+
+console.log(graph.assembleDomObject());
+
+document.getElementById("divTabGraphs").appendChild(graph.assembleDomObject());

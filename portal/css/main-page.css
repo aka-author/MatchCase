@@ -358,6 +358,37 @@ body {
     }
 }
 
+
+#divTestGraph {
+
+    position: relative;
+    height: 200px;
+
+    background: #cccccc;
+
+}
+
+.distGraphRecord {
+    position: absolute;
+    left: 10px;
+    top: 20px;
+    width: 6px;
+    height: 6px;
+    border-radius: 3px;
+    background: #8b0b75;
+}
+
+table.distGraphGrid td {
+    border-left: 1px black dotted;
+    border-right: 1px black dotted;
+}
+
+table.distGraphGrid {
+    border-collapse: collapse;
+    height: 100%;
+
+}
+
 /*
 
 body {
