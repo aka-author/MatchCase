@@ -248,6 +248,14 @@ class DistGraph extends Worker {
         return this.getDist(caseRecord)/this.getMaxDist();
     }
 
+    getRelativeX(x) {
+        return (x - this.getMinX())/this.getXSpan();
+    }
+
+    getRelativeY(y) {
+        return (y - this.getMinY())/this.getYSpan();
+    }
+
     // Formatting
 
     calcLum(normalDist) {
@@ -282,8 +290,8 @@ class DistGraph extends Worker {
 
         console.log(this.getNormalX(caseRecord));
 
-        let left = (100*this.getNormalX(caseRecord)).toString() + "%";
-        let top = (100*(1 - this.getNormalY(caseRecord))).toString() + "%";
+        let left = (100*this.getRelativeX(this.getX(caseRecord))).toString() + "%";
+        let top = (100*(1 - this.getRelativeY(this.getY(caseRecord)))).toString() + "%";
 
         divCase.setAttribute("style", `left: ${left}; top: ${top}; background: ${hslColor}`);
         
