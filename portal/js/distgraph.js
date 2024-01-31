@@ -274,19 +274,19 @@ class DistGraph extends Worker {
     }
 
     getCanvasMinX() {
-        return this.getMinX() - this.getCanvasXExtension();
+        return Math.floor(this.getMinX() - this.getCanvasXExtension());
     }
 
     getCanvasMaxX() {
-        return this.getMaxX() + this.getCanvasXExtension();
+        return Math.ceil(this.getMaxX() + this.getCanvasXExtension());
     }
 
     getCanvasMinY() {
-        return this.getMinY() - this.getCanvasYExtension();
+        return Math.floor(this.getMinY() - this.getCanvasYExtension());
     }
 
     getCanvasMaxY() {
-        return this.getMaxY() + this.getCanvasYExtension();
+        return Math.ceil(this.getMaxY() + this.getCanvasYExtension());
     }
 
     getCanvasXSpan() {
@@ -392,10 +392,10 @@ class DistGraph extends Worker {
 
         for(let i = 1; i <= this.getGridCellsY(); i++) {
             let divLabel = document.createElement("div");
-            divLabel.setAttribute("style", `top : ${(this.getGridCellsY() - i)*span}%`);
-            promo += ySpan;
-            divLabel.textContent = promo.toFixed(this.getYDecimals());
+            divLabel.setAttribute("style", `bottom : ${(i-1)*span}%`);
             
+            divLabel.textContent = promo.toFixed(this.getYDecimals());
+            promo += ySpan;
             divLabel.classList.add("distGraphYLabel");
             yLabels.push(divLabel);
         }
