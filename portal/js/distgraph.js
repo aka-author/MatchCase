@@ -310,12 +310,34 @@ class DistGraph extends Worker {
 
         const xLabels = [];
 
+        const span = 100/this.getGridCellsX();
+
+        for(let i = 0; i < this.getGridCellsX(); i++) {
+            let divLabel = document.createElement("div");
+            divLabel.setAttribute("style", `left: ${i*span}%`);
+            console.log(`left: ${i*span}%`);
+            divLabel.textContent = i.toString();
+            divLabel.classList.add("distGraphXLabel");
+            xLabels.push(divLabel);
+        }
+
         return xLabels;
     }
 
     assembleYLabels() {
 
         const yLabels = [];
+
+        const span = 100/this.getGridCellsX();
+
+        for(let i = this.getGridCellsY(); i > 0 ; i--) {
+            let divLabel = document.createElement("div");
+            divLabel.setAttribute("style", `top : ${(i - 1)*span}%`);
+            console.log(`left: ${i*span}%`);
+            divLabel.textContent = (this.getGridCellsY() - i + 1).toString();
+            divLabel.classList.add("distGraphYLabel");
+            yLabels.push(divLabel);
+        }
 
         return yLabels;
     }
