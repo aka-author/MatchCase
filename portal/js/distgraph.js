@@ -34,7 +34,7 @@ class DistGraph extends Worker {
     setDefaultOptions() {
 
         const defaultOptions = {
-            "canvas_width": 500,
+            "canvas_width": 400,
             "canvas_height": 200,
             "x_col_name": "x",
             "y_col_name": "y",
@@ -45,8 +45,10 @@ class DistGraph extends Worker {
             "instance_sat": 100,
             "grid_cells_x": 4,
             "grid_cells_y": 4,
-            "table_grid_class_name": "distGraphGrid", 
-            "record_class_name": "distGraphRecord"
+            "record_class_name": "distGraphRecord",
+            "grid_class_name": "distGraphGrid", 
+            "canvas_class_name": "distGraphCanvas",
+            "frame_class_name": "distGraphFrame"
         }
 
         this.setOptions(defaultOptions);
@@ -96,12 +98,20 @@ class DistGraph extends Worker {
         return this.options["grid_cells_y"];
     }
 
-    getTableGridClassName() {
-        return this.options["table_grid_class_name"];
-    }
-
     getRecordClassName() {
         return this.options["record_class_name"];
+    }
+
+    getGridClassName() {
+        return this.options["grid_class_name"];
+    }
+
+    getCanvasClassName() {
+        return this.options["canvas_class_name"];
+    }
+
+    getFrameClassName() {
+        return this.options["frame_class_name"];
     }
 
     // Case records
@@ -270,16 +280,12 @@ class DistGraph extends Worker {
 
         let divCase = document.createElement("div");
 
-        let left = (this.getNormalX(caseRecord)*this.getCanvasWidth()).toString() + "px";
-        let top = (this.getCanvasHeight() - this.getNormalY(caseRecord)*this.getCanvasHeight()).toString() + "px";
+        console.log(this.getNormalX(caseRecord));
+
+        let left = (100*this.getNormalX(caseRecord)).toString() + "%";
+        let top = (100*(1 - this.getNormalY(caseRecord))).toString() + "%";
 
         divCase.setAttribute("style", `left: ${left}; top: ${top}; background: ${hslColor}`);
-
-        //divCase.style.background = hslColor;
-        //divCase.style.left = this.getNormalX(caseRecord)*100 + "px";
-        //divCase.style.top = this.getNormalY(caseRecord)*100 + "px";
-
-        //console.log("::", divCase.style.top);
         
         divCase.classList.add(this.getRecordClassName());
 
@@ -300,49 +306,82 @@ class DistGraph extends Worker {
         return this.assembleRecordDomObject(instanceRecord, hslColor);
     }
 
+    assembleXLabels() {
+
+        const xLabels = [];
+
+        return xLabels;
+    }
+
+    assembleYLabels() {
+
+        const yLabels = [];
+
+        return yLabels;
+    }
+
     assembleGridDomObject() {
 
         const tableGrid = document.createElement("table");
-        tableGrid.classList.add(this.getTableGridClassName());
+        tableGrid.classList.add(this.getGridClassName());
         
         for(let ny = 0; ny < this.getGridCellsY(); ny++) {
-
             let tr = document.createElement("tr");
-
             for(let nx = 0; nx < this.getGridCellsX(); nx++) {
-
                 let td = document.createElement("td");
-                
                 tr.appendChild(td);
             }
-
             tableGrid.appendChild(tr);
         }
 
         return tableGrid;
     }
 
-    assembleDomObject() {
+    assembleCanvasDomObject() {
 
         const divCanvas = document.createElement("div");
-        divCanvas.setAttribute("id", this.id);
-        divCanvas.setAttribute("style", `width ${this.getCanvasWidth()}px; height: ${this.getCanvasHeight()}px`)
+        divCanvas.classList.add(this.getCanvasClassName());
 
-        const tableGrid = this.assembleGridDomObject();
-        divCanvas.appendChild(tableGrid);
+        this.tableGrid = this.assembleGridDomObject();
+        divCanvas.appendChild(this.tableGrid);
+        
+        const xLabels = this.assembleXLabels();
+        for(const xlabel of xLabels)
+            divCanvas.appendChild(xlabel);
 
-        for(const caseRecord of this.dataSet) {
-            let divCase = this.assembleCaseDomObject(caseRecord);
-            divCanvas.appendChild(divCase);
-        }
-
-        const divInstance = this.assembleInstanceDomObject(this.instance);
-        divCanvas.appendChild(divInstance);
+        const yLabels = this.assembleYLabels();
+        for(const yLabel of yLabels)
+            divCanvas.appendChild(yLabel);
 
         return divCanvas;
     }
 
-    
+    assembleFrameDomObject() {
+
+        const divFrame = document.createElement("div");
+        divFrame.setAttribute("id", this.id);
+        divFrame.classList.add(this.getFrameClassName());
+
+        this.divCanvas = this.assembleCanvasDomObject();
+        divFrame.appendChild(this.divCanvas);
+
+        return divFrame;
+    }
+
+    assembleDomObject() {
+
+        this.divFrame = this.assembleFrameDomObject();
+
+        for(const caseRecord of this.dataSet) {
+            let divCase = this.assembleCaseDomObject(caseRecord);
+            this.divCanvas.appendChild(divCase);
+        }
+
+        const divInstance = this.assembleInstanceDomObject(this.instance);
+        this.divCanvas.appendChild(divInstance);
+
+        return this.divFrame;
+    }
 
 }
 
