@@ -34,14 +34,13 @@ class DistGraph extends Worker {
     setDefaultOptions() {
 
         const defaultOptions = {
-            "canvas_width": 400,
-            "canvas_height": 200,
             "x_col_name": "x",
             "y_col_name": "y",
+            "canvas_xy_extension_koeff": 0.1,
             "dist_col_name": "dist",
             "case_hue": 285,
             "case_sat": 100,
-            "case_sat": 115,
+            "instance_hue": 115,
             "instance_sat": 100,
             "grid_cells_x": 4,
             "grid_cells_y": 4,
@@ -52,14 +51,6 @@ class DistGraph extends Worker {
         }
 
         this.setOptions(defaultOptions);
-    }
-
-    getCanvasWidth() {
-        return this.options["canvas_width"];
-    }
-
-    getCanvasHeight() {
-        return this.options["canvas_height"];
     }
 
     getXColName() {
@@ -96,6 +87,10 @@ class DistGraph extends Worker {
 
     getGridCellsY() {
         return this.options["grid_cells_y"];
+    }
+
+    getCanvasXYExtensionKoeff() {
+        return this.options["canvas_xy_extension_koeff"];
     }
 
     getRecordClassName() {
@@ -240,7 +235,6 @@ class DistGraph extends Worker {
     }
 
     getNormalY(caseRecord) {
-        console.log(this.getY(caseRecord), this.getYSpan());
         return this.getY(caseRecord)/this.getYSpan();
     }
 
@@ -248,15 +242,48 @@ class DistGraph extends Worker {
         return this.getDist(caseRecord)/this.getMaxDist();
     }
 
-    getRelativeX(x) {
-        return (x - this.getMinX())/this.getXSpan();
-    }
-
-    getRelativeY(y) {
-        return (y - this.getMinY())/this.getYSpan();
-    }
 
     // Formatting
+
+    getCanvasXExtension() {
+        return this.getXSpan()*this.getCanvasXYExtensionKoeff();
+    }
+
+    getCanvasYExtension() {
+        return this.getYSpan()*this.getCanvasXYExtensionKoeff();
+    }
+
+    getCanvasMinX() {
+        return this.getMinX() - this.getCanvasXExtension();
+    }
+
+    getCanvasMaxX() {
+        return this.getMaxX() + this.getCanvasXExtension();
+    }
+
+    getCanvasMinY() {
+        return this.getMinY() - this.getCanvasYExtension();
+    }
+
+    getCanvasMaxY() {
+        return this.getMaxY() + this.getCanvasYExtension();
+    }
+
+    getCanvasXSpan() {
+        return this.getCanvasMaxX() - this.getCanvasMinX();
+    }
+
+    getCanvasYSpan() {
+        return this.getCanvasMaxY() - this.getCanvasMinY();
+    }
+
+    getCanvasX(x) {
+        return (x - this.getCanvasMinX())/this.getCanvasXSpan();
+    }
+
+    getCanvasY(y) {
+        return 1 - (y - this.getCanvasMinY())/this.getCanvasYSpan();
+    }
 
     calcLum(normalDist) {
         return 25 + normalDist*50;
@@ -288,12 +315,10 @@ class DistGraph extends Worker {
 
         let divCase = document.createElement("div");
 
-        console.log(this.getNormalX(caseRecord));
+        let left = 100*this.getCanvasX(this.getX(caseRecord));
+        let top  = 100*this.getCanvasY(this.getY(caseRecord));
 
-        let left = (100*this.getRelativeX(this.getX(caseRecord))).toString() + "%";
-        let top = (100*(1 - this.getRelativeY(this.getY(caseRecord)))).toString() + "%";
-
-        divCase.setAttribute("style", `left: ${left}; top: ${top}; background: ${hslColor}`);
+        divCase.setAttribute("style", `left: ${left}%; top: ${top}%; background: ${hslColor}`);
         
         divCase.classList.add(this.getRecordClassName());
 
@@ -323,7 +348,6 @@ class DistGraph extends Worker {
         for(let i = 0; i < this.getGridCellsX(); i++) {
             let divLabel = document.createElement("div");
             divLabel.setAttribute("style", `left: ${i*span}%`);
-            console.log(`left: ${i*span}%`);
             divLabel.textContent = i.toString();
             divLabel.classList.add("distGraphXLabel");
             xLabels.push(divLabel);
@@ -341,7 +365,6 @@ class DistGraph extends Worker {
         for(let i = this.getGridCellsY(); i > 0 ; i--) {
             let divLabel = document.createElement("div");
             divLabel.setAttribute("style", `top : ${(i - 1)*span}%`);
-            console.log(`left: ${i*span}%`);
             divLabel.textContent = (this.getGridCellsY() - i + 1).toString();
             divLabel.classList.add("distGraphYLabel");
             yLabels.push(divLabel);
