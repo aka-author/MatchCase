@@ -52,12 +52,17 @@ class DistGraph extends Worker {
             "grid_cells_y": 4,
             "x_decimals": 0,
             "y_decimals": 0,
+            "hint_offset": 2,
             "record_class_name": "distGraphRecord",
             "hint_class_name": "distGraphHint",
             "grid_class_name": "distGraphGrid", 
             "canvas_class_name": "distGraphCanvas",
+            "x_axes_caption_class_name": "distGraphXAxesCaption",
+            "y_axes_caption_class_name": "distGraphYAxesCaption",
             "frame_class_name": "distGraphFrame",
-            "instance_hint_wording": "You are here"
+            "instance_hint_wording": "You are here",
+            "x_caption": undefined,
+            "y_caption": undefined
         }
 
         this.setOptions(defaultOptions);
@@ -127,6 +132,10 @@ class DistGraph extends Worker {
         return this.options["y_decimals"];
     }
 
+    getHintOffset() {
+        return this.options["hint_offset"];
+    }
+
     getRecordClassName() {
         return this.options["record_class_name"];
     }
@@ -139,6 +148,14 @@ class DistGraph extends Worker {
         return this.options["grid_class_name"];
     }
 
+    getXAxesCaptionClassName() {
+        return this.options["x_axes_caption_class_name"];
+    }
+
+    getYAxesCaptionClassName() {
+        return this.options["y_axes_caption_class_name"];
+    }
+
     getCanvasClassName() {
         return this.options["canvas_class_name"];
     }
@@ -149,6 +166,14 @@ class DistGraph extends Worker {
 
     getInstanceHintWording() {
         return this.options["instance_hint_wording"]
+    }
+
+    getXAxesCaption() {
+        return this.options["x_caption"];
+    }
+
+    getYAxesCaption() {
+        return this.options["y_caption"];
     }
 
     // Case records
@@ -292,7 +317,6 @@ class DistGraph extends Worker {
         return this.getDist(caseRecord)/this.getMaxDist();
     }
 
-
     // Formatting
 
     getCanvasXExtension() {
@@ -434,8 +458,10 @@ class DistGraph extends Worker {
 
                 const hint = document.getElementById(id + "hint");
                 hint.style.display = "";
-                hint.style.left = (caseDot.offsetLeft - hint.clientWidth) + "px";
-                hint.style.top = (caseDot.offsetTop - hint.clientHeight) + "px";
+
+                const ofs = me.getHintOffset();
+                hint.style.left = (caseDot.offsetLeft - hint.clientWidth - ofs) + "px";
+                hint.style.top =  (caseDot.offsetTop - hint.clientHeight - ofs) + "px";
 
                 me.activeHint = hint;
             });
@@ -516,6 +542,32 @@ class DistGraph extends Worker {
         return tableGrid;
     }
 
+    assembleXAxesCaptionDomObject() {
+
+        const xAxesCaption = this.getXAxesCaption();
+
+        if(!xAxesCaption) return null;
+
+        const divXCaption = document.createElement("div");
+        divXCaption.classList.add(this.getXAxesCaptionClassName());
+        divXCaption.textContent = xAxesCaption;
+
+        return divXCaption;
+    }
+
+    assembleYAxesCaptionDomObject() {
+
+        const yAxesCaption = this.getYAxesCaption();
+
+        if(!yAxesCaption) return null;
+
+        const divYCaption = document.createElement("div");
+        divYCaption.classList.add(this.getYAxesCaptionClassName());
+        divYCaption.textContent = yAxesCaption;
+
+        return divYCaption;
+    }
+
     assembleCanvasDomObject() {
 
         const divCanvas = document.createElement("div");
@@ -531,6 +583,14 @@ class DistGraph extends Worker {
         const yLabels = this.assembleYLabels();
         for(const yLabel of yLabels)
             divCanvas.appendChild(yLabel);
+
+        const divXCaption = this.assembleXAxesCaptionDomObject();
+        if(!!divXCaption)
+            divCanvas.appendChild(divXCaption);
+
+        const divYCaption = this.assembleYAxesCaptionDomObject();
+        if(!!divYCaption)
+            divCanvas.appendChild(divYCaption);
 
         const me = this;
         divCanvas.addEventListener("click", function(e) {
@@ -592,7 +652,9 @@ graph.setOptions(
         "grid_cells_x": 5,
         "grid_cells_y": 5,
         "x_decimals": 2,
-        "y_decimals": 1
+        "y_decimals": 1,
+        "x_caption": "Indetity, Gb",
+        "y_caption": "Temperature, K"
     }
 )
 
