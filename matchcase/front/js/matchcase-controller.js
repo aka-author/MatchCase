@@ -246,7 +246,8 @@ class MatchCaseController {
         this.caseReport = this.createCaseReport();
         this.directoryViewer = this.createDirectoryViewer();
         this.similarCasesReporter = this.createSimilarCasesReporter();
-        this.emplPerfGraph = this.createEmplPerfGraph();
+        this.revenuePriceGraph = this.createRevenuePriceGraph();
+        //this.emplPerfGraph = this.createEmplPerfGraph();
     }
 
     getChief() {
@@ -294,6 +295,26 @@ class MatchCaseController {
 
     getSimilarCasesReporter() {
         return this.similarCasesReporter;
+    }
+
+    createRevenuePriceGraph() {
+        
+        const revenuePriceGraph = new DistGraph(this, "divEmplPerf")
+            .setOptions(
+                {   
+                    "x_col_name": "acquiree_revenue",
+                    "y_col_name": "deal_price",
+                    "name_col_name": "acquiree_name",
+                    "link_col_name": "deal_www",
+                    "dist_col_name": "similarity",
+                    "x_axes_caption": "Revenue, $M",
+                    "y_axes_caption": "Price, $M"
+                }
+            );
+
+        document.getElementById("divTabGraphs").appendChild(revenuePriceGraph.assembleDomObject());
+
+        return revenuePriceGraph;
     }
 
     createEmplPerfGraph() {
@@ -344,11 +365,16 @@ class MatchCaseController {
         
         if(!!updateData.similarCases) {
             this.getCaseReport().updateSimilarCasesTable(updateData.similarCases);
-                    
-        this.emplPerfGraph
+             
+        this.revenuePriceGraph
             .setDataSet(updateData.similarCases)
             .setInstance(updateData.instance)
             .updateCanvas();
+
+        /*this.emplPerfGraph
+            .setDataSet(updateData.similarCases)
+            .setInstance(updateData.instance)
+            .updateCanvas();*/
         }
 
         stopProgressIndicator("divSimilarCases");
