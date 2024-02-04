@@ -37,6 +37,7 @@ class DistGraph extends Worker {
     setDefaultOptions() {
 
         const defaultOptions = {
+            "dummy_graph_image": "img/soldout01-2.png",
             "x_col_name": "x",
             "y_col_name": "y",
             "name_col_name": "name",
@@ -45,16 +46,14 @@ class DistGraph extends Worker {
             "canvas_xy_extension_koeff": 0.1,
             "case_hue": 285,
             "case_sat": 100,
-            "instance_hue": 115,
-            "instance_sat": 100,
-            "dot_width": 6,
-            "dot_height": 6,
             "grid_cells_x": 4,
             "grid_cells_y": 4,
             "x_decimals": 0,
             "y_decimals": 0,
             "hint_offset": 2,
+            "hint_show_timeout": 500,
             "record_class_name": "distGraphRecord",
+            "instance_class_name": "distGraphInstance",
             "hint_class_name": "distGraphHint",
             "grid_class_name": "distGraphGrid", 
             "canvas_class_name": "distGraphCanvas",
@@ -62,11 +61,15 @@ class DistGraph extends Worker {
             "y_axes_caption_class_name": "distGraphYAxesCaption",
             "frame_class_name": "distGraphFrame",
             "instance_hint_wording": "You are here",
-            "x_caption": undefined,
-            "y_caption": undefined
+            "x_axes_caption": undefined,
+            "y_axes_caption": undefined
         }
 
         this.setOptions(defaultOptions);
+    }
+
+    getDummyGraphImage() {
+        return this.options["dummy_graph_image"];
     }
 
     getXColName() {
@@ -105,14 +108,6 @@ class DistGraph extends Worker {
         return this.options["instance_sat"];
     }
 
-    getDotWidth() {
-        return this.options["dot_width"];
-    }
-
-    getDotHeight() {
-        return this.options["dot_height"];
-    }
-
     getGridCellsX() {
         return this.options["grid_cells_x"];
     }
@@ -137,8 +132,16 @@ class DistGraph extends Worker {
         return this.options["hint_offset"];
     }
 
+    getHintShowTimeout() {
+        return this.options["hint_show_timeout"];
+    }
+
     getRecordClassName() {
         return this.options["record_class_name"];
+    }
+
+    getInstanceClassName() {
+        return this.options["instance_class_name"];
     }
 
     getHintClassName() {
@@ -170,11 +173,11 @@ class DistGraph extends Worker {
     }
 
     getXAxesCaption() {
-        return this.options["x_caption"];
+        return this.options["x_axes_caption"];
     }
 
     getYAxesCaption() {
-        return this.options["y_caption"];
+        return this.options["y_axes_caption"];
     }
 
     // Case records
@@ -276,22 +279,16 @@ class DistGraph extends Worker {
     }
 
     setDataSet(dataSet) {
-
         this.dataSet = dataSet;
-        
         this.detectMinMax();
-
         return this;
     }
 
     // Instance
 
     setInstance(instance) {
-
         this.instance = instance;
-
         this.detectMinMax();
-
         return this;
     }
 
@@ -377,15 +374,6 @@ class DistGraph extends Worker {
         return this.assembleHslColor(hue, sat, lum);
     }
 
-    assembleInstanceColor(caseRecord) {
-
-        const hue = this.getInstanceHue();
-        const sat = this.getInstanceSaturation();
-        const lum = this.calcLum(this.getNormalDist(caseRecord));
-
-        return this.assembleHslColor(hue, sat, lum);
-    }
-
     assembleCaseHintContent(caseRecord) {
 
         const divName = document.createElement("div");
@@ -415,8 +403,10 @@ class DistGraph extends Worker {
 
         const hint = this.getActiveHint();
 
-        if(!!hint)
+        if(!!hint) {
             hint.style.display = "none";
+            hint.style.zIndex = 0;
+        }
 
         return this;
     }
@@ -433,38 +423,62 @@ class DistGraph extends Worker {
         return divHint;
     }
 
-    assembleRecordDomObject(caseRecord, hslColor, id) {
+    setWaitingForHintFlag(flag=true) {
+        this.waitingForHintFlag = flag;
+        return this;
+    }
+
+    isWaitingForHint() {
+        return this.waitingForHintFlag;
+    }
+
+    assembleRecordDomObject(caseRecord, id, hslColor=undefined) {
 
         const divCase = document.createElement("div");
         divCase.setAttribute("id", id + "dot");
 
         const left = 100*this.getCanvasX(this.getX(caseRecord));
-        const leftExpr = `calc(${left}% - ${this.getDotWidth()/2}px)`;
-
         const top  = 100*this.getCanvasY(this.getY(caseRecord));
-        const topExpr = `calc(${top}% - ${this.getDotHeight()/2}px)`;
-        
-        divCase.setAttribute("style", `left: ${leftExpr}; top: ${topExpr}; background: ${hslColor}`);
+        let strStyle = `left: ${left}%; top: ${top}%;`;
+        strStyle += !!hslColor ? ` background: ${hslColor};` : "";
+        divCase.setAttribute("style", strStyle);
         
         divCase.classList.add(this.getRecordClassName());
 
         if(!!id) {
+
             const me = this;
+
+            divCase.addEventListener("mouseout", function(e) {
+                me.setWaitingForHintFlag(false);
+            });
 
             divCase.addEventListener("mouseover", function(e) {
 
-                const caseDot = document.getElementById(id + "dot");
+                me.setWaitingForHintFlag();
 
-                me.hideActiveHint();
+                setTimeout(
 
-                const hint = document.getElementById(id + "hint");
-                hint.style.display = "";
+                    function() {
 
-                const ofs = me.getHintOffset();
-                hint.style.left = (caseDot.offsetLeft - hint.clientWidth - ofs) + "px";
-                hint.style.top =  (caseDot.offsetTop - hint.clientHeight - ofs) + "px";
+                        if(me.isWaitingForHint()) {
 
-                me.activeHint = hint;
+                            const caseDot = document.getElementById(id + "dot");
+
+                            me.hideActiveHint();
+
+                            const hint = document.getElementById(id + "hint");
+                            hint.style.display = "";
+                            hint.style.zIndex = 100000;
+
+                            const ofs = me.getHintOffset();
+                            hint.style.left = (caseDot.offsetLeft - caseDot.clientWidth/2 - hint.clientWidth - ofs) + "px";
+                            hint.style.top  = (caseDot.offsetTop - caseDot.clientHeight/2 - hint.clientHeight - ofs) + "px";
+
+                            me.activeHint = hint;
+                        } 
+                    }, me.getHintShowTimeout()
+                )
             });
         }
 
@@ -473,12 +487,16 @@ class DistGraph extends Worker {
 
     assembleCaseDomObject(caseRecord, id) {
         const hslColor = this.assembleCaseColor(caseRecord);
-        return this.assembleRecordDomObject(caseRecord, hslColor, id);
+        return this.assembleRecordDomObject(caseRecord, id, hslColor);
     }
 
     assembleInstanceDomObject(instanceRecord, id) {
-        const hslColor = this.assembleInstanceColor(instanceRecord);
-        return this.assembleRecordDomObject(instanceRecord, hslColor, id);
+        
+        const divInstance = this.assembleRecordDomObject(instanceRecord, id);
+        
+        divInstance.classList.add(this.getInstanceClassName());
+
+        return divInstance;
     }
 
     assembleXLabels() {
@@ -571,7 +589,7 @@ class DistGraph extends Worker {
         divCanvas.classList.add(this.getCanvasClassName());
 
         const divDummy = document.createElement("img");
-        divDummy.setAttribute("src", "img/soldout01-2.png");
+        divDummy.setAttribute("src", this.getDummyGraphImage());
         divDummy.setAttribute("style", "position: absolute; left: 50%; top: 50%; width: 50%; height: 50%; transform: translateX(-50%) translateY(-50%)");
 
         divCanvas.appendChild(divDummy);
@@ -647,6 +665,7 @@ class DistGraph extends Worker {
         let id = createDomId();
 
         let divInstance = this.assembleInstanceDomObject(this.instance, id);
+        
         this.divCanvas.appendChild(divInstance);
 
         let domHintContent = this.assembleInstanceHintContent(this.instance);
@@ -689,6 +708,7 @@ class DistGraph extends Worker {
     }
 }
 
+/*
 console.log("Debugging graphs");
 
 const graph = new DistGraph(null, "divTestGraph");
@@ -720,3 +740,4 @@ graph.setInstance({"x": 4.5, "y":  4, "dist": 0});
 
 graph.updateCanvas();
 console.log(graph);
+*/

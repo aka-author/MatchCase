@@ -370,8 +370,16 @@ div.distGraphRecord {
     top: 20px;
     width: 6px;
     height: 6px;
+    transform: translateX(-50%) translateY(-50%);
     border-radius: 3px;
     background: #8b0b75;
+}
+
+div.distGraphInstance {
+    width: 8px;
+    height: 8px;
+    border-radius: 4px;
+    background: #589d58;
 }
 
 div.distGraphHint {

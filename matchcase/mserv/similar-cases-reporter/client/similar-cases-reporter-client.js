@@ -42,7 +42,8 @@ class MatchCaseSimilarCasesReporter {
 
         let comparation = {
             "valueEstimate": evaluation["company_value"],
-            "similarCases": evaluation["similar_cases"]
+            "similarCases": evaluation["similar_cases"],
+            "instance": evaluation["instance"]
         };
 
         this.getChief().updatePage(comparation);
@@ -55,7 +56,7 @@ class MatchCaseSimilarCasesReporter {
         const instance = {};
 
         for(const key in caseParams) 
-            instance["aquiree_" + key] = caseParams[key];
+            instance["acquiree_" + key] = caseParams[key];
         
         return instance;
     }
@@ -65,8 +66,6 @@ class MatchCaseSimilarCasesReporter {
         let similarCasesReporterUrl = this.getCfg().matchCase.similarCasesReporterUrl;
         let httpRequestData = this.assembleSimilarCasesHttpRequestData(caseParams);
 
-        console.log(caseParams);
-
         const instance = this.assembleInstance(caseParams);
         
         fetch(similarCasesReporterUrl, httpRequestData).then( 
@@ -74,9 +73,8 @@ class MatchCaseSimilarCasesReporter {
                 if(response.ok) 
                     response.json().then(
                         report => {
-                            report["evaluation"]["company_info"] = instance;
+                            report["evaluation"]["instance"] = instance;                
                             this.updatePage(report["evaluation"]); 
-                            console.log("Report:", report);
                         }
                     )
                 else 

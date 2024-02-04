@@ -246,7 +246,7 @@ class MatchCaseController {
         this.caseReport = this.createCaseReport();
         this.directoryViewer = this.createDirectoryViewer();
         this.similarCasesReporter = this.createSimilarCasesReporter();
-        //this.emplPerofGraph = this.createDistGrph();
+        this.emplPerfGraph = this.createEmplPerfGraph();
     }
 
     getChief() {
@@ -298,13 +298,20 @@ class MatchCaseController {
 
     createEmplPerfGraph() {
         
-        const emplPerfGraph = new DistGraph(this, "divDistGraph")
+        const emplPerfGraph = new DistGraph(this, "divEmplPerf")
             .setOptions(
-                {
-                    "x_axes_caption": "Company age, years",
+                {   
+                    "x_col_name": "acquiree_num_employees",
+                    "y_col_name": "acquiree_revenue",
+                    "name_col_name": "acquiree_name",
+                    "link_col_name": "deal_www",
+                    "dist_col_name": "dist",
+                    "x_axes_caption": "Number of employees",
                     "y_axes_caption": "Revenue, $M"
                 }
             );
+
+        document.getElementById("divTabGraphs").appendChild(emplPerfGraph.assembleDomObject());
 
         return emplPerfGraph;
     }
@@ -317,8 +324,6 @@ class MatchCaseController {
     }
 
     updatePage(updateData) {
-
-        console.log(updateData);
 
         if(!!updateData.countries) 
             this.getCaseForm().updateSelectCountry(updateData.countries);
@@ -337,11 +342,11 @@ class MatchCaseController {
         
         if(!!updateData.similarCases) {
             this.getCaseReport().updateSimilarCasesTable(updateData.similarCases);
-            
-            /*this.emplPerfGraph()
-                .setDataSet(updateData.similarCases)
-                .setInstance(updateData.instance)
-                .update();*/
+                    
+        this.emplPerfGraph
+            .setDataSet(updateData.similarCases)
+            .setInstance(updateData.instance)
+            .updateCanvas();
         }
 
         stopProgressIndicator("divSimilarCases");
