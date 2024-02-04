@@ -359,7 +359,7 @@ class DistGraph extends Worker {
 
     calcLum(normalDist) {
         console.log(normalDist, 50*(1 - normalDist));
-        return 100*(1 - normalDist/2);
+        return 255*(1 - normalDist); //100*(1 - normalDist/2);
     }
 
     assembleHslColor(hue, sat, lum) {
@@ -372,7 +372,7 @@ class DistGraph extends Worker {
         const sat = this.getCaseSaturation();
         const lum = this.calcLum(this.getNormalDist(caseRecord));
 
-        return this.assembleHslColor(hue, sat, lum);
+        return `rgb(${lum}, ${lum}, ${lum})`; //this.assembleHslColor(hue, sat, lum);
     }
 
     assembleCaseHintContent(caseRecord) {

@@ -85,57 +85,66 @@ def reverce_similarity(v1: float, v2: float, base: float) -> float:
     return base**(-abs(v1 - v2))
 
 
-def case_similarity(sample: dict, caze: dict) -> int:
+def case_similarity(sample: dict, caze: dict, dependent_varname=None) -> int:
 
     abs_similarity = 0
 
-    if sample["industry"] == caze["acquiree_industry_code"]: 
-        abs_similarity += 1
+    variable_count = 0
 
-    if sample["specialization"] == caze["acquiree_specialization_code"]: 
-        abs_similarity += 1
-
+    # Country
     if sample["country"] == caze["acquiree_country_code"]: 
         abs_similarity += 1
+    variable_count += 1
 
+    # Age
     sample_age = datetime.now().year - sample["founded_in"]
     case_age = caze["acquired_in"] - caze["acquiree_founded_in"]
     abs_similarity += reverce_similarity(sample_age, case_age, 1.1)
+    variable_count += 1
 
-    abs_similarity += reverce_similarity(sample["revenue"], caze["acquiree_revenue"], 1.01)
+    # Industry
+    if sample["industry"] == caze["acquiree_industry_code"]: 
+        abs_similarity += 1
+    variable_count += 1
 
-    similarity = abs_similarity/5
+    # Specialization
+    if sample["specialization"] == caze["acquiree_specialization_code"]: 
+        abs_similarity += 1
+    variable_count += 1
+
+    # Revenue
+    if dependent_varname != "revenue":
+        abs_similarity += reverce_similarity(sample["revenue"], caze["acquiree_revenue"], 1.01)
+        variable_count += 1
+
+    similarity = abs_similarity/variable_count
 
     return similarity
 
 
-def evaluate_company(company_params: dict, cases: list) -> dict:
-
-    
-    case_top1 = {"similarity": 0}
-    case_top2 = {"similarity": 0}
-    case_top3 = {"similarity": 0}
+def evaluate_company(company_params: dict, cases: list, count_top: int=20) -> dict:
 
     for caze in cases:
-
         caze["similarity"] = case_similarity(company_params, caze)
         caze["acquiree_age"] = caze["acquired_in"] - caze["acquiree_founded_in"]
         caze["rate"] = caze["deal_price"]/caze["acquiree_revenue"]
 
-        if case_top1["similarity"] < caze["similarity"]:
-            case_top1 = caze
-        elif case_top2["similarity"] < caze["similarity"]:
-            case_top2 = caze
-        elif case_top3["similarity"] < caze["similarity"]:
-            case_top3 = caze
+    selected_cases = sorted(cases, key=lambda x: x['similarity'], reverse=True)[:count_top] 
 
-    mean_rate = (0.5*case_top1["rate"] + 0.3*case_top2["rate"] + 0.2*case_top3["rate"])
+    total = sum(caze["similarity"] for caze in selected_cases)
+    weights = [caze["similarity"]/total for caze in selected_cases]
+
+    weighted_average_rate = 0
+    for i in range(count_top):
+        weighted_average_rate += weights[i]*selected_cases[i]["rate"]
+    weighted_average_rate /= count_top
+
 
     # print(mean_rate)
 
     evaluation = {
-        "company_value": round(company_params["revenue"]*mean_rate, 2), 
-        "similar_cases": [case_top1, case_top2, case_top3]
+        "company_value": round(company_params["revenue"]*weighted_average_rate, 2), 
+        "similar_cases": selected_cases
     }
 
     return evaluation
