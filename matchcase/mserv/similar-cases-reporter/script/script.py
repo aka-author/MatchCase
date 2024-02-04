@@ -12,6 +12,7 @@ import sys
 import pathlib
 import configparser
 import json
+from datetime import datetime
 from cases_viewer_client import fetch_cases
 
 
@@ -86,22 +87,24 @@ def reverce_similarity(v1: float, v2: float, base: float) -> float:
 
 def case_similarity(sample: dict, caze: dict) -> int:
 
-    similarity = 0
+    abs_similarity = 0
 
     if sample["industry"] == caze["acquiree_industry_code"]: 
-        similarity += 1
+        abs_similarity += 1
 
     if sample["specialization"] == caze["acquiree_specialization_code"]: 
-        similarity += 1
+        abs_similarity += 1
 
     if sample["country"] == caze["acquiree_country_code"]: 
-        similarity += 1
+        abs_similarity += 1
 
-    sample_age = 2023 - sample["founded_in"]
+    sample_age = datetime.now().year - sample["founded_in"]
     case_age = caze["acquired_in"] - caze["acquiree_founded_in"]
-    similarity += reverce_similarity(sample_age, case_age, 1.1)
+    abs_similarity += reverce_similarity(sample_age, case_age, 1.1)
 
-    similarity += reverce_similarity(sample["revenue"], caze["acquiree_revenue"], 1.01)
+    abs_similarity += reverce_similarity(sample["revenue"], caze["acquiree_revenue"], 1.01)
+
+    similarity = abs_similarity/5
 
     return similarity
 
@@ -116,6 +119,7 @@ def evaluate_company(company_params: dict, cases: list) -> dict:
     for caze in cases:
 
         caze["similarity"] = case_similarity(company_params, caze)
+        caze["acquiree_age"] = caze["acquired_in"] - caze["acquiree_founded_in"]
         caze["rate"] = caze["deal_price"]/caze["acquiree_revenue"]
 
         if case_top1["similarity"] < caze["similarity"]:

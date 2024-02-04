@@ -305,7 +305,7 @@ class MatchCaseController {
                     "y_col_name": "acquiree_revenue",
                     "name_col_name": "acquiree_name",
                     "link_col_name": "deal_www",
-                    "dist_col_name": "dist",
+                    "dist_col_name": "similarity",
                     "x_axes_caption": "Number of employees",
                     "y_axes_caption": "Revenue, $M"
                 }
@@ -324,6 +324,8 @@ class MatchCaseController {
     }
 
     updatePage(updateData) {
+
+        console.log(updateData);
 
         if(!!updateData.countries) 
             this.getCaseForm().updateSelectCountry(updateData.countries);

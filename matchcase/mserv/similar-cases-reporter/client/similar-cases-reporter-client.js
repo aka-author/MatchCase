@@ -57,6 +57,8 @@ class MatchCaseSimilarCasesReporter {
 
         for(const key in caseParams) 
             instance["acquiree_" + key] = caseParams[key];
+
+        instance["acquiree_age"] = (new Date().getFullYear()) - instance["acquiree_founded_in"];
         
         return instance;
     }

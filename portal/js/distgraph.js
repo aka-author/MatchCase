@@ -312,7 +312,7 @@ class DistGraph extends Worker {
     }
 
     getNormalDist(caseRecord) {
-        return this.getDist(caseRecord)/this.getMaxDist();
+        return this.getDist(caseRecord);
     }
 
     // Formatting
@@ -358,7 +358,8 @@ class DistGraph extends Worker {
     }
 
     calcLum(normalDist) {
-        return 25 + normalDist*50;
+        console.log(normalDist, 50*(1 - normalDist));
+        return 100*(1 - normalDist/2);
     }
 
     assembleHslColor(hue, sat, lum) {
