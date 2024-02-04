@@ -246,6 +246,7 @@ class MatchCaseController {
         this.caseReport = this.createCaseReport();
         this.directoryViewer = this.createDirectoryViewer();
         this.similarCasesReporter = this.createSimilarCasesReporter();
+        //this.emplPerofGraph = this.createDistGrph();
     }
 
     getChief() {
@@ -295,6 +296,19 @@ class MatchCaseController {
         return this.similarCasesReporter;
     }
 
+    createEmplPerfGraph() {
+        
+        const emplPerfGraph = new DistGraph(this, "divDistGraph")
+            .setOptions(
+                {
+                    "x_axes_caption": "Company age, years",
+                    "y_axes_caption": "Revenue, $M"
+                }
+            );
+
+        return emplPerfGraph;
+    }
+
     updateSpecializationSelect() {
         const industryCode = this.caseForm.getIndustryCode();
         const allSpecializations = this.directoryViewer.getSpecializations();
@@ -303,6 +317,8 @@ class MatchCaseController {
     }
 
     updatePage(updateData) {
+
+        console.log(updateData);
 
         if(!!updateData.countries) 
             this.getCaseForm().updateSelectCountry(updateData.countries);
@@ -319,11 +335,16 @@ class MatchCaseController {
         if(!!updateData.valueEstimate)
             this.getCaseReport().updateValueEstimate(updateData.valueEstimate);
         
-        if(!!updateData.similarCases)
+        if(!!updateData.similarCases) {
             this.getCaseReport().updateSimilarCasesTable(updateData.similarCases);
+            
+            /*this.emplPerfGraph()
+                .setDataSet(updateData.similarCases)
+                .setInstance(updateData.instance)
+                .update();*/
+        }
 
         stopProgressIndicator("divSimilarCases");
-        stopProgressIndicator("divTabBasics");
 
         return this;
     }

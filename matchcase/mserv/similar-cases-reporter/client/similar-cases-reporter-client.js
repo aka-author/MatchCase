@@ -50,17 +50,33 @@ class MatchCaseSimilarCasesReporter {
         return this;
     }
 
+    assembleInstance(caseParams) {
+
+        const instance = {};
+
+        for(const key in caseParams) 
+            instance["aquiree_" + key] = caseParams[key];
+        
+        return instance;
+    }
+
     fetchSimilarCases(caseParams) {
 
         let similarCasesReporterUrl = this.getCfg().matchCase.similarCasesReporterUrl;
         let httpRequestData = this.assembleSimilarCasesHttpRequestData(caseParams);
+
+        console.log(caseParams);
+
+        const instance = this.assembleInstance(caseParams);
         
         fetch(similarCasesReporterUrl, httpRequestData).then( 
             response => {
                 if(response.ok) 
                     response.json().then(
                         report => {
+                            report["evaluation"]["company_info"] = instance;
                             this.updatePage(report["evaluation"]); 
+                            console.log("Report:", report);
                         }
                     )
                 else 

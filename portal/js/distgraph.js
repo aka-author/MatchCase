@@ -15,6 +15,7 @@ class DistGraph extends Worker {
         this.maxX = undefined;
         this.minY = undefined;
         this.maxY = undefined;
+
         this.maxDist = undefined;
 
         this.options = {};
@@ -471,16 +472,12 @@ class DistGraph extends Worker {
     }
 
     assembleCaseDomObject(caseRecord, id) {
-
         const hslColor = this.assembleCaseColor(caseRecord);
-
         return this.assembleRecordDomObject(caseRecord, hslColor, id);
     }
 
     assembleInstanceDomObject(instanceRecord, id) {
-
         const hslColor = this.assembleInstanceColor(instanceRecord);
-
         return this.assembleRecordDomObject(instanceRecord, hslColor, id);
     }
 
@@ -573,24 +570,11 @@ class DistGraph extends Worker {
         const divCanvas = document.createElement("div");
         divCanvas.classList.add(this.getCanvasClassName());
 
-        this.tableGrid = this.assembleGridDomObject();
-        divCanvas.appendChild(this.tableGrid);
-        
-        const xLabels = this.assembleXLabels();
-        for(const xlabel of xLabels)
-            divCanvas.appendChild(xlabel);
+        const divDummy = document.createElement("img");
+        divDummy.setAttribute("src", "img/soldout01-2.png");
+        divDummy.setAttribute("style", "position: absolute; left: 50%; top: 50%; width: 50%; height: 50%; transform: translateX(-50%) translateY(-50%)");
 
-        const yLabels = this.assembleYLabels();
-        for(const yLabel of yLabels)
-            divCanvas.appendChild(yLabel);
-
-        const divXCaption = this.assembleXAxesCaptionDomObject();
-        if(!!divXCaption)
-            divCanvas.appendChild(divXCaption);
-
-        const divYCaption = this.assembleYAxesCaptionDomObject();
-        if(!!divYCaption)
-            divCanvas.appendChild(divYCaption);
+        divCanvas.appendChild(divDummy);
 
         const me = this;
         divCanvas.addEventListener("click", function(e) {
@@ -601,21 +585,47 @@ class DistGraph extends Worker {
         return divCanvas;
     }
 
-    assembleFrameDomObject() {
+    cleanCanvas() {
 
-        const divFrame = document.createElement("div");
-        divFrame.setAttribute("id", this.id);
-        divFrame.classList.add(this.getFrameClassName());
+        while(this.divCanvas.firstChild)
+            this.divCanvas.firstChild.remove();
 
-        this.divCanvas = this.assembleCanvasDomObject();
-        divFrame.appendChild(this.divCanvas);
-
-        return divFrame;
+        return this;
     }
 
-    assembleDomObject() {
+    addGrid() {
+        this.tableGrid = this.assembleGridDomObject();
+        this.divCanvas.appendChild(this.tableGrid);
+        return this;
+    }
 
-        this.divFrame = this.assembleFrameDomObject();
+    addLabels() {
+
+        this.xLabels = this.assembleXLabels();
+        for(const xlabel of this.xLabels)
+            this.divCanvas.appendChild(xlabel);
+
+        this.yLabels = this.assembleYLabels();
+        for(const yLabel of this.yLabels)
+            this.divCanvas.appendChild(yLabel);
+
+        return this;
+    }
+
+    addAxesCaptions() {
+
+        const divXCaption = this.assembleXAxesCaptionDomObject();
+        if(!!divXCaption)
+            this.divCanvas.appendChild(divXCaption);
+
+        const divYCaption = this.assembleYAxesCaptionDomObject();
+        if(!!divYCaption)
+            this.divCanvas.appendChild(divYCaption);
+
+        return this;
+    }
+
+    addCaseDots() {
 
         for(const caseRecord of this.dataSet) {
 
@@ -629,6 +639,11 @@ class DistGraph extends Worker {
             this.divCanvas.appendChild(divHint);
         }
 
+        return this;
+    }
+
+    addInstanceDot() {
+
         let id = createDomId();
 
         let divInstance = this.assembleInstanceDomObject(this.instance, id);
@@ -637,15 +652,48 @@ class DistGraph extends Worker {
         let domHintContent = this.assembleInstanceHintContent(this.instance);
         let divHint = this.assembleHintDomObject(this.instance, id, domHintContent);
         this.divCanvas.appendChild(divHint);
+
+        return this;
+    }
+
+    updateCanvas() {
+
+        this.cleanCanvas();
+
+        this.addGrid()
+            .addLabels()
+            .addAxesCaptions()
+            .addCaseDots()
+            .addInstanceDot();
+
+        return this;
+    }
+
+    assembleFrameDomObject() {
+
+        const divFrame = document.createElement("div");
+        divFrame.setAttribute("id", this.id);
+        divFrame.classList.add(this.getFrameClassName());
+
+        return divFrame;
+    }
+
+    assembleDomObject() {
+
+        this.divFrame = this.assembleFrameDomObject();
+        
+        this.divCanvas = this.assembleCanvasDomObject();
+        this.divFrame.appendChild(this.divCanvas);
         
         return this.divFrame;
     }
-
 }
 
-console.log("!!!");
+console.log("Debugging graphs");
 
 const graph = new DistGraph(null, "divTestGraph");
+console.log(graph.assembleDomObject());
+document.getElementById("divTabGraphs").appendChild(graph.assembleDomObject());
 
 graph.setOptions(
     {
@@ -670,8 +718,5 @@ graph.setDataSet(
 
 graph.setInstance({"x": 4.5, "y":  4, "dist": 0});
 
+graph.updateCanvas();
 console.log(graph);
-
-console.log(graph.assembleDomObject());
-
-document.getElementById("divTabGraphs").appendChild(graph.assembleDomObject());
