@@ -304,6 +304,8 @@ class MatchCaseController {
                 {   
                     "x_col_name": "acquiree_revenue",
                     "y_col_name": "deal_price",
+                    "x_axes_type": "natural",
+                    "y_axes_type": "natural",
                     "name_col_name": "acquiree_name",
                     "link_col_name": "deal_www",
                     "dist_col_name": "similarity",

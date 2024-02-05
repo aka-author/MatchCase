@@ -3,6 +3,100 @@ function fallback(explicitValue, defaultValue) {
     return !!explicitValue ? explicitValue : defaultValue;
 }
 
+function areAllNonNegative(array) {
+    return array.every(element => element >= 0);
+}
+
+function areAllNonNegativeIntegers(array) {
+    return array.every(element => Number.isInteger(element) && element >= 0);
+}
+
+function suggestBestRealScale(values, nIntervals, extKoeff) {
+
+    const vMin = Math.min(...values);
+    const vMax = Math.max(...values);
+    const span = vMax - vMin;
+
+    const sMin = vMin - span*extKoeff;
+    const sMax = vMax + span*extKoeff;
+    const step = (sMax - sMin)/nIntervals;
+
+    return {"sMin": sMin, "sMax": sMax, "step": step};
+}
+
+function suggestBestNonNegativeScale(values, nIntervals, extKoeff) {
+
+    const vMin = Math.min(...values);
+    const vMax = Math.max(...values);
+    const span = vMax - vMin;
+
+    const sMinTmp = vMin - span*extKoeff;
+
+    const sMin = sMinTmp >=0 ? sMinTmp : 0;
+    const sMax = vMax + span*extKoeff;
+    const step = (sMax - sMin)/nIntervals;
+
+    return {"sMin": sMin, "sMax": sMax, "step": step};
+}
+
+function isMultiple(v1, v2) {
+    const r = v1/v2;
+    return Math.floor(r) === r;
+}
+
+function isNice(v) {
+    const order = Math.ceil(Math.log(v)/Math.log(10)) - 1;
+    return isMultiple(v, 10**order);
+}
+
+function suggestBestIntNonNegativeScale(values, nIntervalsMin, extKoeff) {
+
+    let bestScale = null;
+
+    const vMin = Math.min(...values);
+    const vMax = Math.max(...values);
+
+    const extent = Math.round((vMax - vMin)*extKoeff);
+    const sMinTmp = Math.floor(vMin) - extent;
+    const sMin = sMinTmp >= 0 ? sMinTmp : 0;
+
+    let bestRemain = 100*(vMax - vMin);
+    for(let nIntervals = nIntervalsMin; nIntervals <= 8; nIntervals++) {
+        
+        let sMax = Math.ceil(vMax) + extent;
+        while(!(isMultiple(sMax - sMin, nIntervals) && isNice(sMax)) ?? sMax < vMax*2) sMax++;
+
+        let remain = sMax - vMax;
+        if(bestRemain > remain ) {
+            let step = (sMax - sMin)/nIntervals;
+            bestScale = {"sMin": sMin, "sMax": sMax, "step": step, "nIntervals": nIntervals};
+            bestRemain = remain;
+        }
+    }
+
+    console.log(bestScale);
+
+    return bestScale;
+}
+
+function suggestBestScale(values, nIntervals=4, extKoeff=0.1, scaleType="auto") {
+
+    switch(scaleType) {
+        case "natural": 
+            return suggestBestIntNonNegativeScale(values, nIntervals, extKoeff);
+        case "nonNegative":
+            return suggestBestNonNegativeScale(values, nIntervals, extKoeff);
+        default:
+            if(areAllNonNegativeIntegers(values)) 
+                return suggestBestIntNonNegativeScale(values, nIntervals, extKoeff);
+            else if(areAllNonNegative(values))
+                return suggestBestNonNegativeScale(values, nIntervals, extKoeff);
+            else 
+            return suggestBestRealScale(values, nIntervals, extKoeff);
+    }
+
+}
+
 class DistGraph extends Worker {
 
     constructor(chief, id) {
@@ -22,6 +116,9 @@ class DistGraph extends Worker {
         this.setDefaultOptions();
 
         this.activeHint = null;
+
+        this.xScale = null;
+        this.yScale = null;
     }
 
     // Options
@@ -46,8 +143,10 @@ class DistGraph extends Worker {
             "canvas_xy_extension_koeff": 0.1,
             "case_hue": 285,
             "case_sat": 100,
-            "grid_cells_x": 4,
-            "grid_cells_y": 4,
+            "grid_cells_x": 3,
+            "grid_cells_y": 3,
+            "x_axes_type": "auto",
+            "y_axes_type": "auto",
             "x_decimals": 0,
             "y_decimals": 0,
             "hint_offset": 2,
@@ -109,11 +208,19 @@ class DistGraph extends Worker {
     }
 
     getGridCellsX() {
-        return this.options["grid_cells_x"];
+        return !!this.xScale ? this.xScale.nIntervals : this.options["grid_cells_x"];
     }
 
     getGridCellsY() {
-        return this.options["grid_cells_y"];
+        return !!this.yScale ? this.yScale.nIntervals : this.options["grid_cells_y"];
+    }
+
+    getXAxesType() {
+        return this.options["x_axes_type"];
+    }
+
+    getYAxesType() {
+        return this.options["y_axes_type"];
     }
 
     getCanvasXYExtensionKoeff() {
@@ -326,19 +433,19 @@ class DistGraph extends Worker {
     }
 
     getCanvasMinX() {
-        return Math.floor(this.getMinX() - this.getCanvasXExtension());
+        return this.xScale.sMin;
     }
 
     getCanvasMaxX() {
-        return Math.ceil(this.getMaxX() + this.getCanvasXExtension());
+        return this.xScale.sMax;
     }
 
     getCanvasMinY() {
-        return Math.floor(this.getMinY() - this.getCanvasYExtension());
+        return this.yScale.sMin;
     }
 
     getCanvasMaxY() {
-        return Math.ceil(this.getMaxY() + this.getCanvasYExtension());
+        return this.yScale.sMax;
     }
 
     getCanvasXSpan() {
@@ -358,8 +465,7 @@ class DistGraph extends Worker {
     }
 
     calcLum(normalDist) {
-        console.log(normalDist, 50*(1 - normalDist));
-        return 255*(1 - normalDist); //100*(1 - normalDist/2);
+        return 255*(1 - normalDist);
     }
 
     assembleHslColor(hue, sat, lum) {
@@ -500,12 +606,29 @@ class DistGraph extends Worker {
         return divInstance;
     }
 
+    assembleScales() {
+
+        this.xScale = suggestBestScale(
+            this.getExtendedColValues(this.getXColName()),
+            this.getGridCellsX(),
+            this.getCanvasXYExtensionKoeff(),
+            this.getXAxesType()
+        );
+
+        this.yScale = suggestBestScale(
+            this.getExtendedColValues(this.getYColName()),
+            this.getGridCellsY(),
+            this.getCanvasXYExtensionKoeff(),
+            this.getYAxesType()
+        );
+    }
+
     assembleXLabels() {
 
         const xLabels = [];
 
         const span = 100/this.getGridCellsX();
-        const xSpan = this.getCanvasXSpan()/this.getGridCellsX(); 
+        const xSpan = this.xScale.step; 
         let promo = this.getCanvasMinX();
 
         for(let i = 0; i < this.getGridCellsX(); i++) {
@@ -525,7 +648,7 @@ class DistGraph extends Worker {
         const yLabels = [];
 
         const span = 100/this.getGridCellsY();
-        let ySpan = this.getCanvasYSpan()/this.getGridCellsY();
+        let ySpan = this.yScale.step; //this.getCanvasYSpan()/this.getGridCellsY();
         let promo = this.getCanvasMinY();
 
         for(let i = 1; i <= this.getGridCellsY(); i++) {
@@ -677,6 +800,8 @@ class DistGraph extends Worker {
     }
 
     updateCanvas() {
+
+        this.assembleScales();
 
         this.cleanCanvas();
 
