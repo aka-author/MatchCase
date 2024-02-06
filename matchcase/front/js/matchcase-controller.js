@@ -299,7 +299,7 @@ class MatchCaseController {
 
     createRevenuePriceGraph() {
         
-        const revenuePriceGraph = new DistGraph(this, "divEmplPerf")
+        const revenuePriceGraph = new SimGraph(this, "divEmplPerf")
             .setOptions(
                 {   
                     "x_col_name": "acquiree_revenue",
@@ -308,7 +308,7 @@ class MatchCaseController {
                     "y_axes_type": "natural",
                     "name_col_name": "acquiree_name",
                     "link_col_name": "deal_www",
-                    "dist_col_name": "similarity",
+                    "sim_col_name": "similarity",
                     "x_axes_caption": "Revenue, $M",
                     "y_axes_caption": "Price, $M"
                 }
@@ -328,7 +328,7 @@ class MatchCaseController {
                     "y_col_name": "acquiree_revenue",
                     "name_col_name": "acquiree_name",
                     "link_col_name": "deal_www",
-                    "dist_col_name": "similarity",
+                    "sim_col_name": "similarity",
                     "x_axes_caption": "Number of employees",
                     "y_axes_caption": "Revenue, $M"
                 }
@@ -371,6 +371,7 @@ class MatchCaseController {
         this.revenuePriceGraph
             .setDataSet(updateData.similarCases)
             .setInstance(updateData.instance)
+            .setTrend(updateData.trend)
             .updateCanvas();
 
         /*this.emplPerfGraph

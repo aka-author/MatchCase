@@ -43,6 +43,7 @@ class MatchCaseSimilarCasesReporter {
         let comparation = {
             "valueEstimate": evaluation["company_value"],
             "similarCases": evaluation["similar_cases"],
+            "trend": evaluation["trend"],
             "instance": evaluation["instance"]
         };
 

@@ -144,7 +144,8 @@ def evaluate_company(company_params: dict, cases: list, count_top: int=20) -> di
 
     evaluation = {
         "company_value": round(company_params["revenue"]*weighted_average_rate, 2), 
-        "similar_cases": selected_cases
+        "similar_cases": selected_cases,
+        "trend": {"a": 5, "b": 30}
     }
 
     return evaluation

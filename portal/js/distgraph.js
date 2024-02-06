@@ -1,4 +1,18 @@
 
+function clipChildToParent(domParent, domKid) {
+
+    const parentRect = domParent.getBoundingClientRect();
+    const kidRect = domKid.getBoundingClientRect();
+  
+    const top = Math.max(0, kidRect.top - parentRect.top);
+    const right = Math.min(kidRect.right - parentRect.left, parentRect.width);
+    const bottom = Math.min(kidRect.bottom - parentRect.top, parentRect.height);
+    const left = Math.max(0, kidRect.left - parentRect.left);
+  
+    domKid.style.clip = `rect(${top}px, ${right}px, ${bottom}px, ${left}px)`;
+}
+
+
 function similarityGrade(similarity, nGrades) {
 
     let otherness = 1 - similarity;
@@ -10,21 +24,25 @@ function similarityGrade(similarity, nGrades) {
         gradeBound /= 2;
         grade--;
     }
-            
+    
     return grade;
 }
+
 
 function fallback(explicitValue, defaultValue) {
     return !!explicitValue ? explicitValue : defaultValue;
 }
 
+
 function areAllNonNegative(array) {
     return array.every(element => element >= 0);
 }
 
+
 function areAllNaturals(array) {
     return array.every(element => Number.isInteger(element) && element >= 0);
 }
+
 
 function suggestBestRealScale(values, nIntervals, extKoeff) {
 
@@ -38,6 +56,7 @@ function suggestBestRealScale(values, nIntervals, extKoeff) {
 
     return {"sMin": sMin, "sMax": sMax, "step": step, "nIntervals": nIntervals};
 }
+
 
 function suggestBestNonNegativeScale(values, nIntervals, extKoeff) {
 
@@ -54,15 +73,18 @@ function suggestBestNonNegativeScale(values, nIntervals, extKoeff) {
     return {"sMin": sMin, "sMax": sMax, "step": step, "nIntervals": nIntervals};
 }
 
+
 function isMultiple(v1, v2) {
     const r = v1/v2;
     return Math.floor(r) === r;
 }
 
+
 function isNice(v) {
     const order = Math.ceil(Math.log(v)/Math.log(10)) - 1;
     return isMultiple(v, 10**order);
 }
+
 
 function suggestBestNaturalScale(values, nIntervalsMax, extKoeff) {
 
@@ -92,6 +114,7 @@ function suggestBestNaturalScale(values, nIntervalsMax, extKoeff) {
     return bestScale;
 }
 
+
 function detectActualScaleType(values, scaleType) {
 
     let actualScaleType = scaleType;
@@ -107,6 +130,7 @@ function detectActualScaleType(values, scaleType) {
 
     return actualScaleType;
 }
+
 
 function suggestBestScale(values, nIntervals=8, extKoeff=0.1, scaleType="auto") {
 
@@ -128,7 +152,8 @@ function suggestBestScale(values, nIntervals=8, extKoeff=0.1, scaleType="auto") 
     return scale;
 }
 
-class DistGraph extends Worker {
+
+class SimGraph extends Worker {
 
     constructor(chief, id) {
 
@@ -136,12 +161,16 @@ class DistGraph extends Worker {
 
         this.id = id;
 
+        this.dataSet = null;
+        this.instance = null;
+        this.trend = null;
+
         this.minX = undefined;
         this.maxX = undefined;
         this.minY = undefined;
         this.maxY = undefined;
 
-        this.maxDist = undefined;
+        this.maxSim = undefined;
 
         this.options = {};
         this.setDefaultOptions();
@@ -170,7 +199,7 @@ class DistGraph extends Worker {
             "y_col_name": "y",
             "name_col_name": "name",
             "link_col_name": "url",
-            "dist_col_name": "dist",
+            "sim_col_name": "dist",
             "canvas_xy_extension_koeff": 0.1,
             "case_hue": 285,
             "case_sat": 100,
@@ -186,8 +215,12 @@ class DistGraph extends Worker {
             "hint_show_timeout": 500,
             "record_class_name": "distGraphRecord",
             "instance_class_name": "distGraphInstance",
+            "downtrend_line_class_name": "distDowntrendLine",
+            "constant_line_class_name": "distConstantLine",
+            "uptrend_line_class_name": "distUptrendLine",
             "hint_class_name": "distGraphHint",
             "grid_class_name": "distGraphGrid", 
+            "clip_canvas_class_name": "distGraphClipCanvas",
             "canvas_class_name": "distGraphCanvas",
             "x_axes_caption_class_name": "distGraphXAxesCaption",
             "y_axes_caption_class_name": "distGraphYAxesCaption",
@@ -220,8 +253,8 @@ class DistGraph extends Worker {
         return this.options["link_col_name"];
     }
 
-    getDistColName() {
-        return this.options["dist_col_name"];
+    getSimColName() {
+        return this.options["sim_col_name"];
     }
 
     getCaseHue() {
@@ -310,6 +343,22 @@ class DistGraph extends Worker {
         return this.options["y_axes_caption_class_name"];
     }
 
+    getDowntrendLineClassName() {
+        return this.options["downtrend_line_class_name"];
+    }
+
+    getConstantLineClassName() {
+        return this.options["constant_line_class_name"];
+    }
+
+    getUptrendLineClassName() {
+        return this.options["uptrend_line_class_name"];
+    }
+    
+    getClipCanvasClassName() {
+        return this.options["clip_canvas_class_name"];
+    }
+
     getCanvasClassName() {
         return this.options["canvas_class_name"];
     }
@@ -348,8 +397,8 @@ class DistGraph extends Worker {
         return caseRecord[this.getLinkColName()];
     }
 
-    getDist(caseRecord) {
-        return caseRecord[this.getDistColName()];
+    getSim(caseRecord) {
+        return caseRecord[this.getSimColName()];
     }
 
     // Data set
@@ -392,8 +441,8 @@ class DistGraph extends Worker {
         return this.getMaxCol(this.getYColName());
     }
 
-    detectMaxDist() {
-        return this.getMaxCol(this.getDistColName());
+    detectMaxSim() {
+        return this.getMaxCol(this.getSimColName());
     }
 
     detectMinMax() {
@@ -403,7 +452,7 @@ class DistGraph extends Worker {
         this.minY = this.detectMinY();
         this.maxY = this.detectMaxY();
         
-        this.maxDist = this.detectMaxDist();
+        this.maxSim = this.detectMaxSim();
 
         return this;
     }
@@ -424,8 +473,8 @@ class DistGraph extends Worker {
         return this.maxY;
     }
 
-    getMaxDist() {
-        return this.maxDist;
+    getMaxSim() {
+        return this.maxSim;
     }
 
     setDataSet(dataSet) {
@@ -442,6 +491,15 @@ class DistGraph extends Worker {
         return this;
     }
 
+    // Trend
+
+    setTrend(trend) {
+        this.trend = trend;
+        this.trend.a = (this.getMaxY() - this.getMinY())/(this.getMaxX() - this.getMinX());
+        console.log(trend);
+        return this;
+    }
+
     // Calculations
     
     getXSpan() {
@@ -452,8 +510,8 @@ class DistGraph extends Worker {
         return this.getMaxY() - this.getMinY();
     }
 
-    getNormalDist(caseRecord) {
-        return this.getDist(caseRecord);
+    getNormalSim(caseRecord) {
+        return this.getSim(caseRecord);
     }
 
     // Formatting
@@ -491,11 +549,11 @@ class DistGraph extends Worker {
     }
 
     getCanvasX(x) {
-        return (x - this.getCanvasMinX())/this.getCanvasXSpan();
+        return 100*(x - this.getCanvasMinX())/this.getCanvasXSpan();
     }
 
     getCanvasY(y) {
-        return 1 - (y - this.getCanvasMinY())/this.getCanvasYSpan();
+        return 100*(1 - (y - this.getCanvasMinY())/this.getCanvasYSpan());
     }
 
     assembleHslColor(hue, sat, lum) {
@@ -504,7 +562,7 @@ class DistGraph extends Worker {
 
     assembleCaseColor(caseRecord) {
 
-        const similarity = this.getNormalDist(caseRecord);
+        const similarity = this.getNormalSim(caseRecord);
         const nGrades = this.getSimilarityGrades();
         
         const grade = similarityGrade(similarity, nGrades);
@@ -535,6 +593,38 @@ class DistGraph extends Worker {
 
     getActiveHint() {
         return this.activeHint; 
+    }
+
+    putHintToNicePosition(hint, caseDot) {
+
+        const ofs = this.getHintOffset();
+
+        const hintWidth = caseDot.clientWidth;
+        const hintHeight = caseDot.clientHeight;
+        const hintLeft = caseDot.offsetLeft;
+        const hintTop = caseDot.offsetTop;
+        const hintRight = hintLeft + hintWidth;
+        const hintBottom = hintTop + hintHeight;
+
+        hint.style.left = (caseDot.offsetLeft - caseDot.clientWidth/2 - hint.clientWidth - ofs) + "px";
+        hint.style.top  = (caseDot.offsetTop - caseDot.clientHeight/2 - hint.clientHeight - ofs) + "px";
+
+        return this;
+    }
+
+    showHint(id) {
+
+        const caseDot = document.getElementById(id + "dot");
+
+        this.hideActiveHint();
+
+        const hint = document.getElementById(id + "hint");
+        hint.style.display = "";
+        hint.style.zIndex = 100000;
+
+        this.putHintToNicePosition(hint, caseDot);
+
+        this.activeHint = hint;
     }
 
     hideActiveHint() {
@@ -575,8 +665,8 @@ class DistGraph extends Worker {
         const divCase = document.createElement("div");
         divCase.setAttribute("id", id + "dot");
 
-        const left = 100*this.getCanvasX(this.getX(caseRecord));
-        const top  = 100*this.getCanvasY(this.getY(caseRecord));
+        const left = this.getCanvasX(this.getX(caseRecord));
+        const top  = this.getCanvasY(this.getY(caseRecord));
         let strStyle = `left: ${left}%; top: ${top}%;`;
         strStyle += !!hslColor ? ` background: ${hslColor};` : "";
         divCase.setAttribute("style", strStyle);
@@ -596,25 +686,8 @@ class DistGraph extends Worker {
                 me.setWaitingForHintFlag();
 
                 setTimeout(
-
                     function() {
-
-                        if(me.isWaitingForHint()) {
-
-                            const caseDot = document.getElementById(id + "dot");
-
-                            me.hideActiveHint();
-
-                            const hint = document.getElementById(id + "hint");
-                            hint.style.display = "";
-                            hint.style.zIndex = 100000;
-
-                            const ofs = me.getHintOffset();
-                            hint.style.left = (caseDot.offsetLeft - caseDot.clientWidth/2 - hint.clientWidth - ofs) + "px";
-                            hint.style.top  = (caseDot.offsetTop - caseDot.clientHeight/2 - hint.clientHeight - ofs) + "px";
-
-                            me.activeHint = hint;
-                        } 
+                        if(me.isWaitingForHint()) me.showHint(id);
                     }, me.getHintShowTimeout()
                 )
             });
@@ -738,9 +811,39 @@ class DistGraph extends Worker {
         return divYCaption;
     }
 
+    getTrendLineClassname(a) {
+
+        switch(Math.sign(a)) {
+            case -1: return this.getDowntrendLineClassName();
+            case  0: return this.getConstantLineClassName();
+            case  1: return this.getUptrendLineClassName();
+        }
+    }
+
+    assembleTrendLineDomObject() {
+
+        const divTrend = document.createElement("div");
+
+        divTrend.classList.add(this.getTrendLineClassname(this.trend.a));
+        
+        return divTrend;
+    }
+
+    assembleClipCanvasDomObject() {
+
+        const divClipCanvas = document.createElement("div");
+
+        divClipCanvas.setAttribute("style", "");
+        divClipCanvas.classList.add(this.getClipCanvasClassName());
+
+        return divClipCanvas;
+    }
+
     assembleCanvasDomObject() {
 
         const divCanvas = document.createElement("div");
+
+        divCanvas.setAttribute("style", "");
         divCanvas.classList.add(this.getCanvasClassName());
 
         const divDummy = document.createElement("img");
@@ -759,6 +862,9 @@ class DistGraph extends Worker {
     }
 
     cleanCanvas() {
+
+        while(this.divClipCanvas.firstChild)
+            this.divClipCanvas.firstChild.remove();
 
         while(this.divCanvas.firstChild)
             this.divCanvas.firstChild.remove();
@@ -830,6 +936,40 @@ class DistGraph extends Worker {
         return this;
     }
 
+    updateTrend() {
+
+        const a = this.trend.a;
+        const b = this.trend.b;
+
+        const xP1 = this.getMinX();
+        const yP1 = a*xP1 + b;
+        const xP2 = this.getMaxX();
+        const yP2 = a*xP2 + b;
+
+        const xP1C = this.getCanvasX(xP1);
+        const yP1C = this.getCanvasY(yP1);
+
+        const xP2C = this.getCanvasX(xP2);
+        const yP2C = this.getCanvasY(yP2);
+        
+        this.divTrend.style.left = xP1C + "%";
+        this.divTrend.style.top = Math.min(yP1C, yP2C) + "%";
+        this.divTrend.style.width = (xP2C - xP1C) + "%";
+        this.divTrend.style.height = Math.abs(yP2C - yP1C) + "%";
+
+        return this;
+    }
+
+    addTrend() {
+
+        this.divTrend = this.assembleTrendLineDomObject();
+        
+        this.divClipCanvas.appendChild(this.divTrend);
+        this.updateTrend();
+        
+        return this;
+    }
+    
     updateCanvas() {
 
         this.assembleScales();
@@ -839,6 +979,7 @@ class DistGraph extends Worker {
         this.addGrid()
             .addLabels()
             .addAxesCaptions()
+            .addTrend()
             .addCaseDots()
             .addInstanceDot();
 
@@ -848,18 +989,29 @@ class DistGraph extends Worker {
     assembleFrameDomObject() {
 
         const divFrame = document.createElement("div");
+
         divFrame.setAttribute("id", this.id);
         divFrame.classList.add(this.getFrameClassName());
 
         return divFrame;
     }
 
+    handle__resize(e) {
+        console.log("resize");
+    }
+
     assembleDomObject() {
 
         this.divFrame = this.assembleFrameDomObject();
         
+        this.divClipCanvas = this.assembleClipCanvasDomObject();
+        this.divFrame.appendChild(this.divClipCanvas);
+
         this.divCanvas = this.assembleCanvasDomObject();
         this.divFrame.appendChild(this.divCanvas);
+
+        const me = this;
+        window.addEventListener("resize", e => {me.handle__resize()});
         
         return this.divFrame;
     }
@@ -868,7 +1020,7 @@ class DistGraph extends Worker {
 /*
 console.log("Debugging graphs");
 
-const graph = new DistGraph(null, "divTestGraph");
+const graph = new SimGraph(null, "divTestGraph");
 console.log(graph.assembleDomObject());
 document.getElementById("divTabGraphs").appendChild(graph.assembleDomObject());
 
