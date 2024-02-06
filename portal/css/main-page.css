@@ -410,9 +410,10 @@ table.distGraphGrid {
     font-size: 8pt;
 }
 
-.distGraphYLabel {
+div.distGraphYLabel {
     position: absolute;
-    transform: rotate(-90deg);
+    transform: rotate(180deg);
+    writing-mode: vertical-rl;
     left: -12pt;
     font-size: 8pt;
 }
@@ -420,7 +421,7 @@ table.distGraphGrid {
 .distGraphXAxesCaption {
     position: absolute;
     left: 50%;
-    top: 290px;
+    top: 300px;
     transform: translateX(-50%);
     font-size: 10pt;
     font-weight: bold;
@@ -429,21 +430,24 @@ table.distGraphGrid {
 .distGraphYAxesCaption {
     position: absolute;
     transform: rotate(-90deg) translateY(-50%);
-    left: -60pt;
+    left: -55px;
     top: 50%;
     font-size: 10pt;
     font-weight: bold;
 }
 
 .distGraphCanvas {
-    position: relative;
-    width: calc(100% - 10pt);
+    position: absolute;
+    left: 50px;
+    top: 15px;
+    width: calc(100% - 65px);
     height: calc(100% - 50pt);
     border: 1px solid #000000;
     background: #fbfaf2;;
 }
 
 div.distGraphFrame {
+    position: relative;
     height: 330px;
     margin-top: 15pt;
     margin-right: 15pt;

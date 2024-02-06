@@ -1,4 +1,19 @@
 
+function similarityGrade(similarity, nGrades) {
+
+    let otherness = 1 - similarity;
+
+    let gradeBound = 0.5;
+    let grade = nGrades - 1;
+
+    while(0 < grade && otherness <= gradeBound) {         
+        gradeBound /= 2;
+        grade--;
+    }
+            
+    return grade;
+}
+
 function fallback(explicitValue, defaultValue) {
     return !!explicitValue ? explicitValue : defaultValue;
 }
@@ -7,7 +22,7 @@ function areAllNonNegative(array) {
     return array.every(element => element >= 0);
 }
 
-function areAllNonNegativeIntegers(array) {
+function areAllNaturals(array) {
     return array.every(element => Number.isInteger(element) && element >= 0);
 }
 
@@ -21,7 +36,7 @@ function suggestBestRealScale(values, nIntervals, extKoeff) {
     const sMax = vMax + span*extKoeff;
     const step = (sMax - sMin)/nIntervals;
 
-    return {"sMin": sMin, "sMax": sMax, "step": step};
+    return {"sMin": sMin, "sMax": sMax, "step": step, "nIntervals": nIntervals};
 }
 
 function suggestBestNonNegativeScale(values, nIntervals, extKoeff) {
@@ -36,7 +51,7 @@ function suggestBestNonNegativeScale(values, nIntervals, extKoeff) {
     const sMax = vMax + span*extKoeff;
     const step = (sMax - sMin)/nIntervals;
 
-    return {"sMin": sMin, "sMax": sMax, "step": step};
+    return {"sMin": sMin, "sMax": sMax, "step": step, "nIntervals": nIntervals};
 }
 
 function isMultiple(v1, v2) {
@@ -49,7 +64,7 @@ function isNice(v) {
     return isMultiple(v, 10**order);
 }
 
-function suggestBestIntNonNegativeScale(values, nIntervalsMin, extKoeff) {
+function suggestBestNaturalScale(values, nIntervalsMax, extKoeff) {
 
     let bestScale = null;
 
@@ -61,40 +76,56 @@ function suggestBestIntNonNegativeScale(values, nIntervalsMin, extKoeff) {
     const sMin = sMinTmp >= 0 ? sMinTmp : 0;
 
     let bestRemain = 100*(vMax - vMin);
-    for(let nIntervals = nIntervalsMin; nIntervals <= 8; nIntervals++) {
+    for(let nIntervals = 3; nIntervals <= nIntervalsMax; nIntervals++) {
         
         let sMax = Math.ceil(vMax) + extent;
-        while(!(isMultiple(sMax - sMin, nIntervals) && isNice(sMax)) ?? sMax < vMax*2) sMax++;
+        while(!(isMultiple(sMax - sMin, nIntervals) && isNice(sMax)) && sMax < vMax*2) sMax++;
 
         let remain = sMax - vMax;
-        if(bestRemain > remain ) {
+        if(bestRemain > remain) {
             let step = (sMax - sMin)/nIntervals;
             bestScale = {"sMin": sMin, "sMax": sMax, "step": step, "nIntervals": nIntervals};
             bestRemain = remain;
         }
     }
 
-    console.log(bestScale);
-
     return bestScale;
 }
 
-function suggestBestScale(values, nIntervals=4, extKoeff=0.1, scaleType="auto") {
+function detectActualScaleType(values, scaleType) {
 
-    switch(scaleType) {
-        case "natural": 
-            return suggestBestIntNonNegativeScale(values, nIntervals, extKoeff);
-        case "nonNegative":
-            return suggestBestNonNegativeScale(values, nIntervals, extKoeff);
-        default:
-            if(areAllNonNegativeIntegers(values)) 
-                return suggestBestIntNonNegativeScale(values, nIntervals, extKoeff);
-            else if(areAllNonNegative(values))
-                return suggestBestNonNegativeScale(values, nIntervals, extKoeff);
-            else 
-            return suggestBestRealScale(values, nIntervals, extKoeff);
+    let actualScaleType = scaleType;
+
+    if(scaleType == "auto") {
+        if(areAllNaturals(values)) 
+            actualScaleType = "natural"
+        else if(areAllNonNegative(values))
+            actualScaleType = "nonNegative"
+        else 
+            actualScaleType = "real"
     }
 
+    return actualScaleType;
+}
+
+function suggestBestScale(values, nIntervals=8, extKoeff=0.1, scaleType="auto") {
+
+    let scale = null;
+
+    const actualScaleType = detectActualScaleType(values, scaleType);
+
+    switch(actualScaleType) {
+        case "natural": 
+            scale = suggestBestNaturalScale(values, nIntervals, extKoeff);
+            break;
+        case "nonNegative":
+            scale = suggestBestNonNegativeScale(values, nIntervals, extKoeff);
+            break;
+        default: 
+            scale = suggestBestRealScale(values, nIntervals, extKoeff);
+    }
+
+    return scale;
 }
 
 class DistGraph extends Worker {
@@ -143,8 +174,10 @@ class DistGraph extends Worker {
             "canvas_xy_extension_koeff": 0.1,
             "case_hue": 285,
             "case_sat": 100,
-            "grid_cells_x": 3,
-            "grid_cells_y": 3,
+            "similarity_grades": 5,
+            "similarity_colors": ["#000000", "#888888", "#cccccc"],
+            "grid_cells_x": 8,
+            "grid_cells_y": 8,
             "x_axes_type": "auto",
             "y_axes_type": "auto",
             "x_decimals": 0,
@@ -205,6 +238,16 @@ class DistGraph extends Worker {
 
     getInstanceSaturation() {
         return this.options["instance_sat"];
+    }
+
+    getSimilarityGrades() {
+        return this.options["similarity_grades"];
+    }
+
+    getSimilarityColor(grade) {
+        const colors = this.options["similarity_colors"];
+        const lastColorIdx = colors.length - 1;
+        return grade <= lastColorIdx ? colors[grade] : colors[lastColorIdx];
     }
 
     getGridCellsX() {
@@ -409,15 +452,6 @@ class DistGraph extends Worker {
         return this.getMaxY() - this.getMinY();
     }
 
-    getNormalX(caseRecord) {
-        
-        return this.getX(caseRecord)/this.getXSpan();
-    }
-
-    getNormalY(caseRecord) {
-        return this.getY(caseRecord)/this.getYSpan();
-    }
-
     getNormalDist(caseRecord) {
         return this.getDist(caseRecord);
     }
@@ -464,21 +498,18 @@ class DistGraph extends Worker {
         return 1 - (y - this.getCanvasMinY())/this.getCanvasYSpan();
     }
 
-    calcLum(normalDist) {
-        return 255*(1 - normalDist);
-    }
-
     assembleHslColor(hue, sat, lum) {
         return `hsl(${hue}, ${sat}%, ${lum}%)`;
     }
 
     assembleCaseColor(caseRecord) {
 
-        const hue = this.getCaseHue();
-        const sat = this.getCaseSaturation();
-        const lum = this.calcLum(this.getNormalDist(caseRecord));
+        const similarity = this.getNormalDist(caseRecord);
+        const nGrades = this.getSimilarityGrades();
+        
+        const grade = similarityGrade(similarity, nGrades);
 
-        return `rgb(${lum}, ${lum}, ${lum})`; //this.assembleHslColor(hue, sat, lum);
+        return this.getSimilarityColor(grade);
     }
 
     assembleCaseHintContent(caseRecord) {
