@@ -495,8 +495,7 @@ class SimGraph extends Worker {
 
     setTrend(trend) {
         this.trend = trend;
-        this.trend.a = (this.getMaxY() - this.getMinY())/(this.getMaxX() - this.getMinX());
-        console.log(trend);
+        console.log("Trend: ", trend);
         return this;
     }
 
