@@ -13,6 +13,10 @@ import pathlib
 import configparser
 import json
 from datetime import datetime
+
+import numpy as np
+from sklearn.linear_model import LinearRegression
+
 from cases_viewer_client import fetch_cases
 
 
@@ -80,41 +84,68 @@ def fetch_acquire_cases() -> dict:
     return fetch_cases(viewer_url)
 
 
-def reverce_similarity(v1: float, v2: float, base: float) -> float:
+def measure_values_reverse_similarity(v1: float, v2: float, base: float) -> float:
 
     return base**(-abs(v1 - v2))
 
 
-def case_similarity(sample: dict, caze: dict, dependent_varname=None) -> int:
+def assemble_company_case(company: dict) -> dict:
+
+    company_case = {
+        "acquiree_country_code": company["country"],
+        "acquiree_founded_in": datetime.now().year - company["founded_in"],
+        "acquiree_industry_code": company["industry"],
+        "acquiree_specialization_code": company["specialization"],
+        "acquiree_revenue": company["revenue"]
+    }
+
+    return company_case
+
+
+def measure_cases_similarity(
+    case1: dict, 
+    case2: dict, 
+    dependent_varname: str=None) -> int:
 
     abs_similarity = 0
 
     variable_count = 0
 
     # Country
-    if sample["country"] == caze["acquiree_country_code"]: 
+    if case1["acquiree_country_code"] == case2["acquiree_country_code"]: 
         abs_similarity += 1
     variable_count += 1
 
     # Age
-    sample_age = datetime.now().year - sample["founded_in"]
-    case_age = caze["acquired_in"] - caze["acquiree_founded_in"]
-    abs_similarity += reverce_similarity(sample_age, case_age, 1.1)
+    sample_age = datetime.now().year - case1["acquiree_founded_in"]
+    case_age = case2["acquired_in"] - case2["acquiree_founded_in"]
+    
+    abs_similarity += measure_values_reverse_similarity(
+        sample_age, case_age, 
+        1.1
+    )
+    
     variable_count += 1
 
     # Industry
-    if sample["industry"] == caze["acquiree_industry_code"]: 
+    if case1["acquiree_industry_code"] == case2["acquiree_industry_code"]: 
         abs_similarity += 1
     variable_count += 1
 
     # Specialization
-    if sample["specialization"] == caze["acquiree_specialization_code"]: 
+    if case1["acquiree_specialization_code"] == case2["acquiree_specialization_code"]: 
         abs_similarity += 1
     variable_count += 1
 
     # Revenue
-    if dependent_varname != "revenue":
-        abs_similarity += reverce_similarity(sample["revenue"], caze["acquiree_revenue"], 1.01)
+    if dependent_varname != "acquiree_revenue":
+        
+        abs_similarity += measure_values_reverse_similarity(
+            case1["acquiree_revenue"], 
+            case2["acquiree_revenue"], 
+            1.01
+        )
+
         variable_count += 1
 
     similarity = abs_similarity/variable_count
@@ -122,33 +153,70 @@ def case_similarity(sample: dict, caze: dict, dependent_varname=None) -> int:
     return similarity
 
 
-def evaluate_company(company_params: dict, cases: list, count_top: int=20) -> dict:
+def prepare_regression_model(x_vect: list, y_vect: list)  -> LinearRegression:
+
+    x_column = np.array(x_vect).reshape(-1, 1)
+
+    model = LinearRegression()
+    model.fit(x_column, y_vect)
+
+    return model
+
+
+def get_regression_coeffs(trained_model: LinearRegression):
+
+    return trained_model.coef_[0], trained_model.intercept_
+
+
+def predict_with_regression(x: float, trained_model: LinearRegression) -> float: 
+
+    x_column = np.array([x]).reshape(-1, 1)
+
+    y_prediction = trained_model.predict(x_column)[0]
+
+    return y_prediction
+
+
+def get_col_values(colname: str, cases: dict) -> list:
+
+    return [caze[colname] for caze in cases]
+
+
+def predict_company_price(company_case: dict, cases: list, count_top: int=20) -> dict:
 
     for caze in cases:
-        caze["similarity"] = case_similarity(company_params, caze)
+        caze["similarity"] = measure_cases_similarity(company_case, caze)
         caze["acquiree_age"] = caze["acquired_in"] - caze["acquiree_founded_in"]
         caze["rate"] = caze["deal_price"]/caze["acquiree_revenue"]
 
-    selected_cases = sorted(cases, key=lambda x: x['similarity'], reverse=True)[:count_top] 
+    similar_cases = sorted(
+        cases, 
+        key = lambda caze: caze['similarity'], reverse=True
+    )
 
-    total = sum(caze["similarity"] for caze in selected_cases)
-    weights = [caze["similarity"]/total for caze in selected_cases]
+    top_similar_cases = similar_cases[:count_top]
 
-    weighted_average_rate = 0
-    for i in range(count_top):
-        weighted_average_rate += weights[i]*selected_cases[i]["rate"]
-    weighted_average_rate /= count_top
+    revenues = get_col_values("acquiree_revenue", top_similar_cases)
+    prices = get_col_values("deal_price", top_similar_cases)
 
+    price_prediction_model = prepare_regression_model(revenues, prices)
 
-    # print(mean_rate)
+    company_price_prediction = round(
+        predict_with_regression(
+            company_case["acquiree_revenue"], 
+            price_prediction_model
+        ), 2
+    )
+    
+    a, b = get_regression_coeffs(price_prediction_model)
 
-    evaluation = {
-        "company_value": round(company_params["revenue"]*weighted_average_rate, 2), 
-        "similar_cases": selected_cases,
-        "trend": {"a": 5, "b": 30}
+    prediction = {
+        "company_value": company_price_prediction, 
+        "similar_cases": top_similar_cases,
+        "trend": {"a": a, "b": b}
     }
 
-    return evaluation
+    return prediction
 
 
 def serialize_report(report: dict) -> str:
@@ -160,8 +228,11 @@ def serialize_report(report: dict) -> str:
 
 def process_request(): 
 
-    http_request_body = sys.stdin.read(int(os.environ.get("CONTENT_LENGTH", "0")))
+    http_request_body = None
 
+    
+    http_request_body = sys.stdin.read(int(os.environ.get("CONTENT_LENGTH", "0")))
+    
     file_path = 'c:/tmp/!!/log.txt'
     file = open(file_path, 'w')
     string_to_write = http_request_body
@@ -174,14 +245,16 @@ def process_request():
 
     if validation_report["status_code"] == 0:
 
+        company_case = assemble_company_case(company_params)
         cases = fetch_acquire_cases()
 
-        evaluation = evaluate_company(company_params, cases)
+        prediction = predict_company_price(company_case, cases)
 
         report = {
             "status_code": 0,
-            "evaluation": evaluation
+            "evaluation": prediction
         }
+
     else:
         report = {
             "status_code": 1,

@@ -55,7 +55,7 @@ class MatchCaseSimilarCasesReporter {
     assembleInstance(caseParams) {
 
         const instance = {};
-
+        console.log(caseParams);
         for(const key in caseParams) 
             instance["acquiree_" + key] = caseParams[key];
 
@@ -77,6 +77,7 @@ class MatchCaseSimilarCasesReporter {
                 if(response.ok) 
                     response.json().then(
                         report => {
+                            instance["deal_price"] = report["evaluation"]["company_value"]
                             report["evaluation"]["instance"] = instance;                
                             this.updatePage(report["evaluation"]); 
                         }
