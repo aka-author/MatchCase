@@ -98,7 +98,7 @@ function suggestBestNaturalScale(values, nIntervalsMax, extKoeff) {
     const sMin = sMinTmp >= 0 ? sMinTmp : 0;
 
     let bestRemain = 100*(vMax - vMin);
-    for(let nIntervals = 2; nIntervals <= nIntervalsMax; nIntervals++) {
+    for(let nIntervals = 3; nIntervals <= nIntervalsMax; nIntervals++) {
         
         let sMax = Math.ceil(vMax) + extent;
         while(!(isMultiple(sMax - sMin, nIntervals) && isNice(sMax)) && sMax < vMax*2) sMax++;

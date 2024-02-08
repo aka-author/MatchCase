@@ -93,7 +93,7 @@ def assemble_company_case(company: dict) -> dict:
 
     company_case = {
         "acquiree_country_code": company["country"],
-        "acquiree_founded_in": datetime.now().year - company["founded_in"],
+        "acquiree_founded_in": company["founded_in"],
         "acquiree_industry_code": company["industry"],
         "acquiree_specialization_code": company["specialization"],
         "acquiree_revenue": company["revenue"]
