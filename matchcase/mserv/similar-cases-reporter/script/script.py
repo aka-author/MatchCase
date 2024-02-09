@@ -247,7 +247,6 @@ def measure_cases_similarity(
 def detect_outliers(data, colname, threshold=2.0):
     values = [entry[colname] for entry in data]
     z_scores = stats.zscore(values)
-    #outliers = [data[i] for i in range(len(data)) if abs(z_scores[i]) > threshold]
     outliers = [i for i in range(len(data)) if abs(z_scores[i]) > threshold]
     
     return outliers
@@ -262,8 +261,10 @@ def separate_outliers(cases: list, colname: str) -> "tuple(list, list)":
 
     for idx, caze in enumerate(cases):
         if not (idx in outlier_indices):
+            caze["outlier_flag"] = False
             regular_cases.append(caze)
         else:
+            caze["outlier_flag"] = True
             outlier_cases.append(caze)
 
     return regular_cases, outlier_cases
@@ -338,7 +339,7 @@ def predict_company_price(
 
     prediction = {
         "company_value": company_price_prediction, 
-        "similar_cases": regular_cases,
+        "similar_cases": regular_cases + outlier_cases,
         "trend": {"a": a, "b": b}
     }
 

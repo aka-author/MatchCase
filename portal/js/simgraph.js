@@ -214,6 +214,7 @@ class SimGraph extends Worker {
             "hint_offset": 2,
             "hint_show_timeout": 500,
             "record_class_name": "distGraphRecord",
+            "outlier_record_class_name": "distGraphOutlierRecord",
             "instance_class_name": "distGraphInstance",
             "downtrend_line_class_name": "distDowntrendLine",
             "constant_line_class_name": "distConstantLine",
@@ -321,6 +322,10 @@ class SimGraph extends Worker {
 
     getRecordClassName() {
         return this.options["record_class_name"];
+    }
+
+    getOutlierRecordClassName() {
+        return this.options["outlier_record_class_name"];
     }
 
     getInstanceClassName() {
@@ -670,7 +675,10 @@ class SimGraph extends Worker {
         strStyle += !!hslColor ? ` background: ${hslColor};` : "";
         divCase.setAttribute("style", strStyle);
         
-        divCase.classList.add(this.getRecordClassName());
+        const className = !caseRecord["outlier_flag"] ? 
+            this.getRecordClassName() : this.getOutlierRecordClassName() ;
+
+        divCase.classList.add(className);
 
         if(!!id) {
 
