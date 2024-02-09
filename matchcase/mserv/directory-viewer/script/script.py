@@ -62,7 +62,8 @@ def fetch_countries(lang_code: str) -> dict:
     
     directory["countries"] = [{
             "country_code2": country.get("country_code2"),
-            "country_name": country.get(lang_code) 
+            "country_name": country.get(lang_code),
+            "regime_type": country.get("regime_type")
         } for country in countries]
 
     return directory

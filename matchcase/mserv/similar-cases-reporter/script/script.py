@@ -17,8 +17,11 @@ from datetime import datetime
 import numpy as np
 from sklearn.linear_model import LinearRegression
 
+from directory_viewer_client import fetch_countries
 from cases_viewer_client import fetch_cases
 
+
+# Utils
 
 def get_config(sect_name: str, key_name: str) -> configparser.ConfigParser:
 
@@ -41,12 +44,64 @@ def safe_float(input_string: any) -> float:
     return float(input_string) if input_string is not None else 0
 
 
+# Countries
+
+def fetch_countries_directory(lang_code: str="en") -> dict:
+
+    viewer_url = get_config("MICROSERVICES", "directories-viewer")
+
+    return fetch_countries(viewer_url, lang_code)
+
+
+def get_country_info(country_code: str, countries: list) -> dict:
+
+    country_info = {
+        "country_code2": "??", 
+        "en": "Unknown", 
+        "regime_type": "Dolbocrathy"
+    }
+
+    for country in countries:
+        if country["country_code2"] == country_code:
+            country_info = country
+            break
+
+    return country_info
+
+
+def get_country_regime_type(country_code: str, countries: list) -> str:
+
+    return get_country_info(country_code, countries).get("regime_type")
+
+
+def compare_regimes(regime1: str, regime2: str) -> float:
+
+    if regime1 == regime2:
+        return 1
+
+    if regime1.find("democracy") != -1 and regime2.find("democracy") != -1:
+        return 0.75
+    
+    return 1
+
+
+# Cases
+
+def fetch_acquire_cases() -> dict:
+
+    viewer_url = get_config("MICROSERVICES", "cases-viewer")
+
+    return fetch_cases(viewer_url)
+ 
+
+# Company 
+
 def parse_company_params(http_request_body: str) -> dict:
 
     """
     request_data = company_params = {
         "industry": "IT",
-        "country": "Israel",
+        "country": "IL",
         "founded_in": 2010,
         "specialization": "CS.",
         "num_employees": 10,
@@ -77,34 +132,45 @@ def validate_company_params(company_params: dict) -> dict:
     return validation_report
 
 
-def fetch_acquire_cases() -> dict:
-
-    viewer_url = get_config("MICROSERVICES", "cases-viewer")
-
-    return fetch_cases(viewer_url)
-
-
-def measure_values_reverse_similarity(v1: float, v2: float, base: float) -> float:
-
-    return base**(-abs(v1 - v2))
-
-
 def assemble_company_case(company: dict) -> dict:
 
+    country_code = company["country"]
+
     company_case = {
-        "acquiree_country_code": company["country"],
+        "acquiree_country_code": country_code,
         "acquiree_founded_in": company["founded_in"],
         "acquiree_industry_code": company["industry"],
         "acquiree_specialization_code": company["specialization"],
+        "acquiree_num_employees": company["num_employees"],
         "acquiree_revenue": company["revenue"]
     }
 
     return company_case
 
 
+# Calculations 
+
+def fraction_string_to_float(fraction_str: str) -> float:
+    try:
+        numerator, denominator = map(int, fraction_str.split('/'))
+        result = numerator / denominator
+        return result
+    except ValueError:
+        return float('inf')
+    
+
+def measure_values_reverse_similarity(
+    v1: float, 
+    v2: float, 
+    base: float) -> float:
+
+    return base**(-abs(v1 - v2))
+
+
 def measure_cases_similarity(
     case1: dict, 
     case2: dict, 
+    countries: list,
     dependent_varname: str=None) -> int:
 
     abs_similarity = 0
@@ -112,8 +178,22 @@ def measure_cases_similarity(
     variable_count = 0
 
     # Country
+
     if case1["acquiree_country_code"] == case2["acquiree_country_code"]: 
         abs_similarity += 1
+    else:
+        regime1 = get_country_regime_type(
+            case1["acquiree_country_code"], 
+            countries
+        )
+
+        regime2 = get_country_regime_type(
+            case2["acquiree_country_code"], 
+            countries
+        )
+
+        abs_similarity += compare_regimes(regime1, regime2)
+    
     variable_count += 1
 
     # Age
@@ -137,6 +217,15 @@ def measure_cases_similarity(
         abs_similarity += 1
     variable_count += 1
 
+    # Number of employees
+    abs_similarity += measure_values_reverse_similarity(
+            case1["acquiree_num_employees"], 
+            case2["acquiree_num_employees"], 
+            1.01
+        )
+
+    variable_count += 1
+
     # Revenue
     if dependent_varname != "acquiree_revenue":
         
@@ -153,7 +242,7 @@ def measure_cases_similarity(
     return similarity
 
 
-def prepare_regression_model(x_vect: list, y_vect: list)  -> LinearRegression:
+def prepare_regression_model(x_vect: list, y_vect: list) -> LinearRegression:
 
     x_column = np.array(x_vect).reshape(-1, 1)
 
@@ -182,10 +271,15 @@ def get_col_values(colname: str, cases: dict) -> list:
     return [caze[colname] for caze in cases]
 
 
-def predict_company_price(company_case: dict, cases: list, count_top: int=20) -> dict:
+def predict_company_price(
+    company_case: dict, 
+    cases: list, 
+    countries: list, 
+    count_top: int=20
+) -> dict:
 
     for caze in cases:
-        caze["similarity"] = measure_cases_similarity(company_case, caze)
+        caze["similarity"] = measure_cases_similarity(company_case, caze, countries)
         caze["acquiree_age"] = caze["acquired_in"] - caze["acquiree_founded_in"]
         caze["rate"] = caze["deal_price"]/caze["acquiree_revenue"]
 
@@ -226,6 +320,8 @@ def serialize_report(report: dict) -> str:
     return serialized_report
 
 
+# Main
+
 def process_request(): 
 
     http_request_body = None
@@ -238,17 +334,18 @@ def process_request():
     string_to_write = http_request_body
     file.write(string_to_write)
     file.close()
-
+    
     company_params = parse_company_params(http_request_body)
 
     validation_report = validate_company_params(company_params)
 
     if validation_report["status_code"] == 0:
 
-        company_case = assemble_company_case(company_params)
+        countries = fetch_countries_directory("en")
         cases = fetch_acquire_cases()
-
-        prediction = predict_company_price(company_case, cases)
+        company_case = assemble_company_case(company_params)
+        
+        prediction = predict_company_price(company_case, cases, countries)
 
         report = {
             "status_code": 0,
