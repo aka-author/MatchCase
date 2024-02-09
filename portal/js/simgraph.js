@@ -913,7 +913,9 @@ class SimGraph extends Worker {
 
     addCaseDots() {
 
-        for(const caseRecord of this.dataSet) {
+        for(let idx = this.dataSet.length - 1; idx >=0; idx--) {
+
+            let caseRecord = this.dataSet[idx];
 
             let id = createDomId();
 
