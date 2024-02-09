@@ -16,6 +16,7 @@ from datetime import datetime
 
 import numpy as np
 from sklearn.linear_model import LinearRegression
+from scipy import stats
 
 from directory_viewer_client import fetch_countries
 from cases_viewer_client import fetch_cases
@@ -98,18 +99,19 @@ def fetch_acquire_cases() -> dict:
 
 def parse_company_params(http_request_body: str) -> dict:
 
-    """
-    request_data = company_params = {
-        "industry": "IT",
-        "country": "IL",
-        "founded_in": 2010,
-        "specialization": "CS.",
-        "num_employees": 10,
-        "revenue": 1
-    }
-    """
+    if DEBUG_MODE:
+        request_data = company_params = {
+            "industry": "IT",
+            "country": "IL",
+            "founded_in": 2010,
+            "specialization": "CS.",
+            "num_employees": 10,
+            "revenue": 1
+        }
     
-    request_data = json.loads(http_request_body)
+    
+    if not DEBUG_MODE:
+        request_data = json.loads(http_request_body)
 
     company_params = {
         "industry": request_data.get("industry_code"),
@@ -242,6 +244,31 @@ def measure_cases_similarity(
     return similarity
 
 
+def detect_outliers(data, colname, threshold=2.0):
+    values = [entry[colname] for entry in data]
+    z_scores = stats.zscore(values)
+    #outliers = [data[i] for i in range(len(data)) if abs(z_scores[i]) > threshold]
+    outliers = [i for i in range(len(data)) if abs(z_scores[i]) > threshold]
+    
+    return outliers
+
+
+def separate_outliers(cases: list, colname: str) -> "tuple(list, list)":
+
+    regular_cases = []
+    outlier_cases = []
+
+    outlier_indices = detect_outliers(cases, colname, 1.0)
+
+    for idx, caze in enumerate(cases):
+        if not (idx in outlier_indices):
+            regular_cases.append(caze)
+        else:
+            outlier_cases.append(caze)
+
+    return regular_cases, outlier_cases
+
+
 def prepare_regression_model(x_vect: list, y_vect: list) -> LinearRegression:
 
     x_column = np.array(x_vect).reshape(-1, 1)
@@ -290,8 +317,13 @@ def predict_company_price(
 
     top_similar_cases = similar_cases[:count_top]
 
-    revenues = get_col_values("acquiree_revenue", top_similar_cases)
-    prices = get_col_values("deal_price", top_similar_cases)
+    regular_cases, outlier_cases = separate_outliers(
+        top_similar_cases, 
+        "deal_price"
+    )
+
+    revenues = get_col_values("acquiree_revenue", regular_cases)
+    prices = get_col_values("deal_price", regular_cases)
 
     price_prediction_model = prepare_regression_model(revenues, prices)
 
@@ -306,7 +338,7 @@ def predict_company_price(
 
     prediction = {
         "company_value": company_price_prediction, 
-        "similar_cases": top_similar_cases,
+        "similar_cases": regular_cases,
         "trend": {"a": a, "b": b}
     }
 
@@ -324,16 +356,19 @@ def serialize_report(report: dict) -> str:
 
 def process_request(): 
 
+    if DEBUG_MODE:
+        print("DEBUG_MODE=", DEBUG_MODE)
+
     http_request_body = None
 
+    if not DEBUG_MODE:
+        http_request_body = sys.stdin.read(int(os.environ.get("CONTENT_LENGTH", "0")))
     
-    http_request_body = sys.stdin.read(int(os.environ.get("CONTENT_LENGTH", "0")))
-    
-    file_path = 'c:/tmp/!!/log.txt'
-    file = open(file_path, 'w')
-    string_to_write = http_request_body
-    file.write(string_to_write)
-    file.close()
+        file_path = 'c:/tmp/!!/log.txt'
+        file = open(file_path, 'w')
+        string_to_write = http_request_body
+        file.write(string_to_write)
+        file.close()
     
     company_params = parse_company_params(http_request_body)
 
@@ -362,5 +397,7 @@ def process_request():
     print("\n")
     print(serialize_report(report))
 
+
+DEBUG_MODE = False
 
 process_request()
