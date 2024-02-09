@@ -381,6 +381,7 @@ class MatchCaseController {
         }
 
         stopProgressIndicator("divSimilarCases");
+        stopProgressIndicator("divTabBasics");
 
         return this;
     }
