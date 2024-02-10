@@ -198,6 +198,7 @@ class SimGraph extends Worker {
             "x_col_name": "x",
             "y_col_name": "y",
             "name_col_name": "name",
+            "country_code_col_name": "country_code",
             "link_col_name": "url",
             "sim_col_name": "dist",
             "canvas_xy_extension_koeff": 0.1,
@@ -576,15 +577,18 @@ class SimGraph extends Worker {
 
     assembleCaseHintContent(caseRecord) {
 
-        const divName = document.createElement("div");
+        const divHintContent = document.createElement("div");
 
+        const divName = document.createElement("div");
         const aName = document.createElement("a");
         aName.setAttribute("href", this.getLink(caseRecord));
         aName.setAttribute("target", "_new");
         aName.textContent = this.getName(caseRecord);
         divName.appendChild(aName);
 
-        return divName;
+        divHintContent.appendChild(divName);
+
+        return divHintContent;
     }
 
     assembleInstanceHintContent(caseRecord) {
@@ -1025,6 +1029,99 @@ class SimGraph extends Worker {
         return this.divFrame;
     }
 }
+
+
+class CompanyPriceGraph extends SimGraph {
+
+    getCountryCodeColName() {
+        return this.options["country_code_col_name"];
+    }
+
+    getCountryCode(caseRecord) {
+        return caseRecord[this.getCountryCodeColName()];
+    }
+
+    getCountries() {
+        return this.options["directory_viewer"].getDirectory("countries");
+    }
+
+    getCountryName(caseRecord) {
+        const countryCode = this.getCountryCode(caseRecord);
+        const countries = this.getCountries();
+        return countries.find(c => c["country_code2"] === countryCode)["country_name"];
+    }
+
+    getIndustryCodeColName() {
+        return this.options["industry_code_col_name"];
+    }
+
+    getIndustryCode(caseRecord) {
+        return caseRecord[this.getIndustryCodeColName()];
+    }
+
+    getIndustries() {
+        return this.options["directory_viewer"].getDirectory("industries");
+    }
+
+    getIndustryName(caseRecord) {
+        const industryCode = this.getIndustryCode(caseRecord);
+        const industries = this.getIndustries()
+        return industries.find(i => i["industry_code"] === industryCode)["industry_name"];
+    }
+
+    getSpecializationCodeColName() {
+        return this.options["specialization_code_col_name"];
+    }
+
+    getSpecializationCode(caseRecord) {
+        return caseRecord[this.getSpecializationCodeColName()];
+    }
+
+    getSpecializations() {
+        return this.options["directory_viewer"].getDirectory("specializations");
+    }
+
+    getSpecializationName(caseRecord) {
+        const specCode = this.getSpecializationCode(caseRecord);
+        const specs = this.getSpecializations();
+        return specs.find(s => s["specialization_code"] === specCode)["specialization_name"];
+    }
+
+    getProfile(caseRecord) {
+
+        const industryName = this.getIndustryName(caseRecord);
+        const specName = this.getSpecializationName(caseRecord);
+
+        return `${industryName}/${specName}`;
+    }
+
+    assembleCaseHintContent(caseRecord) {
+
+        const divHintContent = document.createElement("div");
+
+        const divName = document.createElement("div");
+
+        const aName = document.createElement("a");
+        aName.setAttribute("href", this.getLink(caseRecord));
+        aName.setAttribute("target", "_new");
+        aName.textContent = this.getName(caseRecord);
+        divName.appendChild(aName);
+
+        const divCountry = document.createElement("div");
+        divCountry.textContent = this.getCountryName(caseRecord);
+
+        const divProfile = document.createElement("div");
+        divProfile.textContent = this.getProfile(caseRecord);
+
+        divHintContent.appendChild(divName);
+        divHintContent.appendChild(divCountry);
+        divHintContent.appendChild(divProfile);
+
+        return divHintContent;
+    }
+
+}
+
 
 /*
 console.log("Debugging graphs");

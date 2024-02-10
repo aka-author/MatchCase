@@ -235,7 +235,7 @@ class MatchCaseReport {
     }
 }
 
-
+             
 class MatchCaseController {
 
     constructor(chief) {
@@ -299,7 +299,7 @@ class MatchCaseController {
 
     createRevenuePriceGraph() {
         
-        const revenuePriceGraph = new SimGraph(this, "divEmplPerf")
+        const revenuePriceGraph = new CompanyPriceGraph(this, "divEmplPerf")
             .setOptions(
                 {   
                     "x_col_name": "acquiree_revenue",
@@ -307,10 +307,14 @@ class MatchCaseController {
                     "x_axes_type": "natural",
                     "y_axes_type": "natural",
                     "name_col_name": "acquiree_name",
+                    "country_code_col_name": "acquiree_country_code",
+                    "industry_code_col_name": "acquiree_industry_code",
+                    "specialization_code_col_name": "acquiree_specialization_code",
                     "link_col_name": "deal_www",
                     "sim_col_name": "similarity",
                     "x_axes_caption": "Revenue, $M",
-                    "y_axes_caption": "Price, $M"
+                    "y_axes_caption": "Price, $M",
+                    "directory_viewer": this.getDirectoryViewer(),
                 }
             );
 
