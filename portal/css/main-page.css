@@ -394,6 +394,14 @@ div.distGraphInstance {
     background: #589d58;
 }
 
+div.distGraphHint div {
+    margin-top: 3pt;
+}
+
+div.distGraphHint div:first-child {
+    margin-top: 0pt;
+}
+
 div.distGraphHint {
     position: absolute;
     padding: 5pt;
@@ -401,6 +409,7 @@ div.distGraphHint {
     border-radius: 3pt;
     background: #f5f5b2;
     font-size: 8pt;
+    box-shadow: 2px 2px #888888;
 }
 
 table.distGraphGrid td {

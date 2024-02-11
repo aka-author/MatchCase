@@ -1084,7 +1084,10 @@ class CompanyPriceGraph extends SimGraph {
     getSpecializationName(caseRecord) {
         const specCode = this.getSpecializationCode(caseRecord);
         const specs = this.getSpecializations();
-        return specs.find(s => s["specialization_code"] === specCode)["specialization_name"];
+
+        const spec = specs.find(s => s["specialization_code"] === specCode);
+
+        return !!spec ? spec["specialization_name"] : "Misc.";
     }
 
     getProfile(caseRecord) {
@@ -1093,6 +1096,43 @@ class CompanyPriceGraph extends SimGraph {
         const specName = this.getSpecializationName(caseRecord);
 
         return `${industryName}/${specName}`;
+    }
+
+    getRevenueColName() {
+        return this.options["x_col_name"];
+    }
+
+    getRevenue(caseRecord) {
+        return caseRecord[this.getRevenueColName()];
+    }
+
+    getAcquirierName(caseRecord) {
+        return caseRecord["acquirer_name"];
+    }
+
+    getPriceColName() {
+        return this.options["y_col_name"];
+    }
+
+    getPrice(caseRecord) {
+        return caseRecord[this.getPriceColName()];
+    }
+
+    getDealYear(caseRecord) {
+        return caseRecord["acquired_in"];
+    }
+
+    getDeal(caseRecord) {
+
+        const acquirier = this.getAcquirierName(caseRecord);
+        const price = this.getPrice(caseRecord);
+        const dealYear = this.getDealYear(caseRecord);
+
+        return `Acquired by ${acquirier} for $M ${price} in ${dealYear}`; 
+    }
+
+    getFoundedIn(caseRecord) {
+        return caseRecord["acquirer_founded_in"];
     }
 
     assembleCaseHintContent(caseRecord) {
@@ -1106,16 +1146,26 @@ class CompanyPriceGraph extends SimGraph {
         aName.setAttribute("target", "_new");
         aName.textContent = this.getName(caseRecord);
         divName.appendChild(aName);
+        divName.appendChild(document.createTextNode(", " + this.getCountryName(caseRecord)));
+        divName.appendChild(document.createTextNode(", " + this.getFoundedIn(caseRecord)));
 
-        const divCountry = document.createElement("div");
-        divCountry.textContent = this.getCountryName(caseRecord);
+        //const divCountry = document.createElement("div");
+        //divCountry.textContent = this.getCountryName(caseRecord);
 
         const divProfile = document.createElement("div");
         divProfile.textContent = this.getProfile(caseRecord);
 
+        const divRevenue = document.createElement("div");
+        divRevenue.textContent = `Revenue, $M: ${this.getRevenue(caseRecord)}`;
+
+        const divDeal = document.createElement("div");
+        divDeal.textContent = this.getDeal(caseRecord);
+
         divHintContent.appendChild(divName);
-        divHintContent.appendChild(divCountry);
+        //divHintContent.appendChild(divCountry);
         divHintContent.appendChild(divProfile);
+        divHintContent.appendChild(divRevenue);
+        divHintContent.appendChild(divDeal);
 
         return divHintContent;
     }
