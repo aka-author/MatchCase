@@ -1137,6 +1137,10 @@ class CompanyPriceGraph extends SimGraph {
         return caseRecord["acquirer_name"];
     }
 
+    getAcquirierLink(caseRecord) {
+        return caseRecord["acquirer_www"];
+    }
+
     getPriceColName() {
         return this.options["y_col_name"];
     }
@@ -1149,13 +1153,19 @@ class CompanyPriceGraph extends SimGraph {
         return caseRecord["acquired_in"];
     }
 
+    getDealLink(caseRecord) {
+        return caseRecord["deal_www"];
+    }
+
     getDeal(caseRecord) {
 
         const acquirier = this.getAcquirierName(caseRecord);
+        const acquirierLink = this.getAcquirierLink(caseRecord);
         const price = this.getPrice(caseRecord);
         const dealYear = this.getDealYear(caseRecord);
+        const dealLink = this.getDealLink(caseRecord)
 
-        return `Acquired by ${acquirier} for $M ${price} in ${dealYear}`; 
+        return `Acquired by <a href="${acquirierLink}" target="_new">${acquirier}</a> for <a href="${dealLink}" target="_new">$M ${price} in ${dealYear}</a>`; 
     }
 
     getFoundedIn(caseRecord) {
@@ -1176,9 +1186,6 @@ class CompanyPriceGraph extends SimGraph {
         divName.appendChild(document.createTextNode(", " + this.getCountryName(caseRecord)));
         divName.appendChild(document.createTextNode(", " + this.getFoundedIn(caseRecord)));
 
-        //const divCountry = document.createElement("div");
-        //divCountry.textContent = this.getCountryName(caseRecord);
-
         const divProfile = document.createElement("div");
         divProfile.textContent = this.getProfile(caseRecord);
 
@@ -1186,10 +1193,9 @@ class CompanyPriceGraph extends SimGraph {
         divRevenue.textContent = `Revenue, $M: ${this.getRevenue(caseRecord)}`;
 
         const divDeal = document.createElement("div");
-        divDeal.textContent = this.getDeal(caseRecord);
+        divDeal.innerHTML = this.getDeal(caseRecord);
 
         divHintContent.appendChild(divName);
-        //divHintContent.appendChild(divCountry);
         divHintContent.appendChild(divProfile);
         divHintContent.appendChild(divRevenue);
         divHintContent.appendChild(divDeal);

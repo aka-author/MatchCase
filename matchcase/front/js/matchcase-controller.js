@@ -310,7 +310,7 @@ class MatchCaseController {
                     "country_code_col_name": "acquiree_country_code",
                     "industry_code_col_name": "acquiree_industry_code",
                     "specialization_code_col_name": "acquiree_specialization_code",
-                    "link_col_name": "deal_www",
+                    "link_col_name": "acquiree_www_webarch",
                     "sim_col_name": "similarity",
                     "x_axes_caption": "Revenue, $M",
                     "y_axes_caption": "Price, $M",
