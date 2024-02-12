@@ -1,3 +1,17 @@
+function correctHintPosition(divHint, divCanvas, divDot) {
+
+    const hintRect = divHint.getBoundingClientRect();
+    const canvasRect = divCanvas.getBoundingClientRect();
+
+    const dotRect = divDot.getBoundingClientRect();
+    dotTop = dotRect.y;
+    
+    if(hintRect.x < 0) {
+        divHint.style.left = (-canvasRect.x) + "px"; 
+        divHint.style.top = (parseInt(divHint.style.top) - 5) + "px"; 
+    }    
+}   
+
 
 function clipChildToParent(domParent, domKid) {
 
@@ -622,17 +636,27 @@ class SimGraph extends Worker {
 
     showHint(id) {
 
-        const caseDot = document.getElementById(id + "dot");
-
         this.hideActiveHint();
+
+        const caseDot = document.getElementById(id + "dot");
 
         const hint = document.getElementById(id + "hint");
         hint.style.display = "";
         hint.style.zIndex = 100000;
 
         this.putHintToNicePosition(hint, caseDot);
-
+        correctHintPosition(hint, this.divCanvas, caseDot);
+        
+        this.activeDot = caseDot;
         this.activeHint = hint;
+
+        this.divHighlit = document.createElement("div");
+        this.divHighlit.classList.add("distGraphHighlite");
+        
+        this.divHighlit.style.width = (caseDot.clientWidth + 6) + "px";
+        this.divHighlit.style.height = (caseDot.clientHeight + 6) + "px";
+        
+        caseDot.appendChild(this.divHighlit);
     }
 
     hideActiveHint() {
@@ -642,6 +666,9 @@ class SimGraph extends Worker {
         if(!!hint) {
             hint.style.display = "none";
             hint.style.zIndex = 0;
+            this.activeDot.style.border = "";
+            this.activeDot.style.borderRadius = this.preverveBorderRadius;
+            this.divHighlit.remove();
         }
 
         return this;

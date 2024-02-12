@@ -379,11 +379,11 @@ div.distGraphOutlierRecord {
     position: absolute;
     left: 10px;
     top: 20px;
-    width: 0px;
-    height: 0px;
+    width: 6px;
+    height: 6px;
     transform: translateX(-50%) translateY(-50%);
     border-radius: 1px;
-    border: 4px solid #f385e8;
+    border: 1px solid #f385e8;
 }
 
 div.distGraphInstance {
@@ -410,6 +410,15 @@ div.distGraphHint {
     background: #f5f5b2;
     font-size: 8pt;
     box-shadow: 2px 2px #888888;
+}
+
+div.distGraphHighlite {
+    position: absolute; 
+    left: 50%; 
+    top: 50%; 
+    transform: translateX(-50%) translateY(-50%); 
+    background: hsla(63, 100%, 50%, 0.32); 
+    border-radius: 50%;
 }
 
 table.distGraphGrid td {
