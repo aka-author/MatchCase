@@ -412,12 +412,21 @@ div.distGraphHint {
     box-shadow: 2px 2px #888888;
 }
 
-div.distGraphHighlite {
+div.distGraphHighlit {
     position: absolute; 
     left: 50%; 
     top: 50%; 
     transform: translateX(-50%) translateY(-50%); 
     background: hsla(63, 100%, 50%, 0.32); 
+    border-radius: 50%;
+}
+
+div.distGraphHighlitClosest {
+    position: absolute; 
+    left: 50%; 
+    top: 50%;
+    transform: translateX(-50%) translateY(-50%); 
+    background: hsla(74, 100%, 50%, 0.32); 
     border-radius: 50%;
 }
 

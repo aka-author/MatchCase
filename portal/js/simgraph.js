@@ -190,9 +190,12 @@ class SimGraph extends Worker {
         this.setDefaultOptions();
 
         this.activeHint = null;
+        this.activeCaseDot = null;
 
         this.xScale = null;
         this.yScale = null;
+
+        this.caseDots = [];
     }
 
     // Options
@@ -634,6 +637,19 @@ class SimGraph extends Worker {
         return this;
     }
 
+    highlitCase(divCase, className) {
+
+        this.divHighlit = document.createElement("div");
+        this.divHighlit.classList.add(className);
+        
+        this.divHighlit.style.width = (divCase.clientWidth + 6) + "px";
+        this.divHighlit.style.height = (divCase.clientHeight + 6) + "px";
+        
+        divCase.appendChild(this.divHighlit);
+
+        return this;
+    }
+
     showHint(id) {
 
         this.hideActiveHint();
@@ -647,14 +663,10 @@ class SimGraph extends Worker {
         this.putHintToNicePosition(hint, caseDot);
         correctHintPosition(hint, this.divCanvas, caseDot);
         
-        this.activeDot = caseDot;
+        this.activeCaseDot = caseDot;
         this.activeHint = hint;
 
-        this.divHighlit = document.createElement("div");
-        this.divHighlit.classList.add("distGraphHighlite");
-        
-        this.divHighlit.style.width = (caseDot.clientWidth + 6) + "px";
-        this.divHighlit.style.height = (caseDot.clientHeight + 6) + "px";
+        this.highlitCase(caseDot, "distGraphHighlit");
         
         caseDot.appendChild(this.divHighlit);
     }
@@ -666,9 +678,10 @@ class SimGraph extends Worker {
         if(!!hint) {
             hint.style.display = "none";
             hint.style.zIndex = 0;
-            this.activeDot.style.border = "";
-            this.activeDot.style.borderRadius = this.preverveBorderRadius;
-            this.divHighlit.remove();
+            this.activeCaseDot.style.border = "";
+            this.activeCaseDot.style.borderRadius = this.preverveBorderRadius;
+            if(!!this.activeCaseDot.lastElementChild)
+                this.activeCaseDot.lastElementChild.remove();
         }
 
         return this;
@@ -944,6 +957,8 @@ class SimGraph extends Worker {
 
     addCaseDots() {
 
+        this.caseDots = [];
+
         for(let idx = this.dataSet.length - 1; idx >=0; idx--) {
 
             let caseRecord = this.dataSet[idx];
@@ -956,6 +971,12 @@ class SimGraph extends Worker {
             let domHintContent = this.assembleCaseHintContent(caseRecord);
             let divHint = this.assembleHintDomObject(caseRecord, id, domHintContent);
             this.divCanvas.appendChild(divHint);
+
+            if(idx < 3) {
+                this.caseDots.push(divCase);
+            }
+
+           
         }
 
         return this;
@@ -1022,6 +1043,10 @@ class SimGraph extends Worker {
             .addTrend()
             .addCaseDots()
             .addInstanceDot();
+
+        /* for(const caseDot of this.caseDots) {
+            this.highlitCase(caseDot, "distGraphHighlitClosest");
+        } */
 
         return this;
     }
